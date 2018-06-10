@@ -133,8 +133,10 @@
     </div>
   </div>
 
-  <el-dialog id="dialog" :title="dialogTitle"
-    v-model="dialogUploadVisible" size="small"
+  <el-dialog
+    id="dialog"
+    :title="dialogTitle"
+    :visible.sync="dialogUploadVisible"
     :close-on-click-modal="false"
     @close="onCloseDialog">
     <el-upload

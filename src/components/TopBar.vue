@@ -18,7 +18,11 @@
       </span>
     </el-dialog>
 
-    <el-menu class="el-menu-demo" mode="horizontal" @select="handleSelect">
+    <el-menu
+      class="el-menu-demo"
+      mode="horizontal"
+      @select="handleSelect"
+    >
       <el-menu-item id="topbar-welcome" index="5">{{ msg }}</el-menu-item>
       <el-menu-item index="1"><i class="el-icon-menu"></i>Home</el-menu-item>
       <el-menu-item v-show="canManage" index="2"><i class="el-icon-setting"></i>Management</el-menu-item>
@@ -78,14 +82,14 @@ export default {
         })
     },
     handleSelect (key, keyPath) {
-      if (key === 1) {
+      if (key === '1') {
         this.$router.push('/home')
-      } else if (key === 2) {
+      } else if (key === '2') {
         this.$router.push('/manage')
-      } else if (key === 3) {
+      } else if (key === '3') {
         //  bug report
         this.bugReportShow = true
-      } else if (key === 4) {
+      } else if (key === '4') {
         this.$store.commit('updateHomeConditionsBuff', {
           searchID: null, dValue: '', cValue: '', yValue: '', doubleClick: ''
         })

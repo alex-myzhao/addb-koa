@@ -183,12 +183,12 @@ import checker from '@/utils/format-checker'
 import ClientConfig from '@/client-config'
 
 export default {
-  name: 'app',
+  name: 'DiseaseData',
   props: ['tree', 'idPath', 'nodeID', 'buff'],
   data () {
     return {
       uploadUrl: '//' + ClientConfig.BASE_URL + '/importtable',
-      form: null,
+      form: {},
       informationOptions: [],
       dialogVisible: false,
       //  upload dialog

@@ -134,7 +134,7 @@ export default {
   data () {
     return {
       uploadUrl: '//' + ClientConfig.BASE_URL + '/importtable',
-      form: null,
+      form: {},
       dataTypeOptions: [],
       surveyTypeOptions: [],
       monthOptions: [],

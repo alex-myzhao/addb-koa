@@ -48,7 +48,10 @@
     </el-form-item>
   </el-form>
 
-  <el-dialog title="Sign Up" :visible.sync="dialogVisible">
+  <el-dialog
+    title="Sign Up"
+    :visible.sync="dialogVisible"
+  >
     <div id="login-dialog">
       <el-form
         :model="register"

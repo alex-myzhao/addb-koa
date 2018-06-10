@@ -146,7 +146,7 @@ export default {
   props: ['tree', 'idPath', 'nodeID', 'buff'],
   data () {
     return {
-      form: null,
+      form: {},
       groupOptions: [],
       dialogVisible: false,
 

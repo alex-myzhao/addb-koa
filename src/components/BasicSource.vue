@@ -193,12 +193,12 @@ import checker from '@/utils/format-checker.js'
 import ClientConfig from '@/client-config'
 
 export default {
-  name: 'app',
+  name: 'BasicSource',
   props: ['tree', 'idPath', 'nodeID', 'buff'],
   data () {
     return {
       uploadUrl: '//' + ClientConfig.BASE_URL + '/importtable',
-      form: null,
+      form: {},
       reporterOptions: [],
       diseaseOptions: [],
       countryOptions: [],

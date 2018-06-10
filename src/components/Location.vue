@@ -86,7 +86,10 @@
     </el-form-item>
   </el-form>
 
-  <el-dialog :title="dialogMsg" v-model="dialogVisible" size="small">
+  <el-dialog
+    :title="dialogMsg"
+    v-model="dialogVisible"
+  >
     <span>此操作将无法撤销</span>
     <span slot="footer" class="dialog-footer">
       <el-button @click="dialogVisible = false">取 消</el-button>
@@ -117,27 +120,15 @@
 import api from '@/utils/api'
 import util from '@/utils/util'
 import checker from '@/utils/format-checker'
+import ClientConfig from '@/client-config'
 
 export default {
-  name: 'app',
+  name: 'Location',
   props: ['tree', 'idPath', 'nodeID', 'buff'],
   data () {
     return {
-      uploadUrl: '//' + this.$store.state.config.baseURL + '/importtable',
-      form: {
-        LocationID: -1,
-        SurveyDescriptionBasicSourcesReportID: -1,
-        SurveyDescriptionSurveyID: -1,
-        ADM1: '',
-        ADM2: '',
-        ADM3: '',
-        PointName: '',
-        PointType: '',
-        Latitude: '',
-        Longitude: '',
-        GeoReferenceSources: '',
-        Note3: ''
-      },
+      uploadUrl: `//${ClientConfig.BASE_URL}/importtable`,
+      form: {},
       grSourceOptions: [],
       pointTypeOptions: [],
       dialogVisible: false,
