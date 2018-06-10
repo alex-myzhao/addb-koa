@@ -1,21 +1,38 @@
 <!-- 编辑数据库条目界面 -->
 <template>
-<div id="detail" v-loading.fullscreen.lock="treeLoading" element-loading-text="数据加载中">
-  <TopBar id="top-menu"></TopBar>
+<div id="detail"
+  v-loading.fullscreen.lock="treeLoading"
+  element-loading-text="Loading"
+>
+  <TopBar id="top-menu"/>
   <div id="detail-page-container">
     <el-row>
-      <el-col id="detail-left-part" :span="6">
-        <el-tree id="detail-tree" :data="treedata" :props="defaultProps"
-          node-key="id" default-expand-all :expand-on-click-node="false"
-          :highlight-current="true" @node-click="clickEvent" ref="tree"
-          accordion>
-        </el-tree>
+      <el-col
+        id="detail-left-part"
+        :span="6"
+      >
+        <el-tree
+          id="detail-tree"
+          :data="treedata"
+          :props="defaultProps"
+          node-key="id"
+          default-expand-all
+          :expand-on-click-node="false"
+          :highlight-current="true"
+          @node-click="clickEvent"
+          ref="tree"
+          accordion
+        />
       </el-col>
       <el-col id="detail-right-part" :span="18">
         <!--  向孩子传递参数: tree组件  -->
-        <router-view @getBuffer="updateBuff"
-          :buff="buff" :tree="tree" :idPath="idPath" :nodeID="nodeID">
-        </router-view>
+        <router-view
+          @getBuffer="updateBuff"
+          :buff="buff"
+          :tree="tree"
+          :idPath="idPath"
+          :nodeID="nodeID"
+        />
       </el-col>
     </el-row>
   </div>
@@ -23,12 +40,12 @@
 </template>
 
 <script>
-import api from '../model/api.js'
+import api from '@/utils/api'
 
-let id = 1000;
+import TopBar from '@/components/TopBar'
 
 export default {
-  data() {
+  data () {
     return {
       inputData: '',
       defaultProps: {
@@ -47,34 +64,33 @@ export default {
   },
   computed: {
     opt: {
-      get() {
+      get () {
         return this.$store.state.opt
       },
-      set(value) {
+      set (value) {
         this.$store.commit('updateOpt', value)
       }
     },
     id: {
-      get() {
+      get () {
         return this.$store.state.treeID
       },
-      set(v) {
+      set (v) {
         this.$store.commit('updateTreeID', v)
       }
     },
-    canEdit: function() {
+    canEdit: function () {
       return this.$store.state.userInfo.authority <= 3
     }
   },
   components: {
-    TopBar: require('../components/TopBar.vue')
+    TopBar
   },
   methods: {
-    //  点击树状视图，进行导航操作
-    clickEvent(data, node, tree) {
+    clickEvent (data, node, tree) {
       var curNode = this.tree.currentNode.node
       this.idPath = []
-      while (typeof(curNode.data.dataID) !== "undefined") {
+      while (typeof (curNode.data.dataID) !== 'undefined') {
         this.idPath.push(curNode.data.dataID)
         curNode = curNode.parent
       }
@@ -82,29 +98,30 @@ export default {
       this.nodeID = this.idPath[node.level - 1]
       switch (node.level) {
         case 1:
-          this.$router.push('/detail/basicsource');
-          break;
+          this.$router.push('/detail/basicsource')
+          break
         case 2:
-          this.$router.push('/detail/survey');
-          break;
+          this.$router.push('/detail/survey')
+          break
         case 3:
-          this.$router.push('/detail/location');
-          break;
+          this.$router.push('/detail/location')
+          break
         case 4:
-          this.$router.push('/detail/disease');
-          break;
+          this.$router.push('/detail/disease')
+          break
         case 5:
-          this.$router.push('/detail/intervention');
-          break;
+          this.$router.push('/detail/intervention')
+          break
         default:
-          console.log('err');
+          console.log('err')
       };
     },
-    updateBuff(type, id, form) {
+    updateBuff (type, id, form) {
       this.buff[type][id] = form
     },
-    buildNode(node, nodeData, level) {
+    buildNode (node, nodeData, level) {
       var len = 0
+      // eslint-disable-next-line
       for (let i in nodeData) len++
       if (len === 0) return
       for (let i in nodeData) {
@@ -118,12 +135,9 @@ export default {
         this.buildNode(newNode.children, nodeData[i], level + 1)
       }
     },
-    initTreeData(rawData) {
+    initTreeData (rawData) {
       this.buildNode(this.treedata, rawData, 0)
     }
-  },
-  created: function() {
-    //  初始化 从服务器拿数据
   },
   mounted: function () {
     //  获取树组件的引用
@@ -136,9 +150,9 @@ export default {
             var getid = res.data.id
             this.treedata = [{
               id: this.id++,
-              label: "Report ID " + getid,
+              label: 'Report ID ' + getid,
               children: [],
-              dataID: getid  //  id from database
+              dataID: getid //  id from database
             }]
             setTimeout(() => {
               this.$refs.tree.$children[0].handleClick()
@@ -146,6 +160,7 @@ export default {
             }, 0)
           })
           .catch((err) => {
+            console.error(err)
             this.$notify({
               title: '',
               message: '网络错误',
@@ -171,7 +186,7 @@ export default {
             }, 0)
           }).catch((err) => {
             console.log('>> /getidtree catch Error')
-            console.log(err)
+            console.error(err)
             // this.treeLoading = false
           })
         break
@@ -179,7 +194,7 @@ export default {
         api.getIdTree(this.$store.state.viewOpt.viewID)
           .then((res) => {
             if (res.data.err === null) {
-              console.log(res.data.data);
+              console.log(res.data.data)
               this.initTreeData(res.data.data)
             } else {
               console.log('>> /getidtree Error')
@@ -191,15 +206,15 @@ export default {
             }, 0)
           }).catch((err) => {
             console.log('>> /getidtree catch Error')
-            console.log(err)
+            console.error(err)
           })
         break
       default:
         this.treeLoading = false
     }
   },
-  beforeDestroy: function() {
-    this.opt = ''  //  清除痕迹
+  beforeDestroy: function () {
+    this.opt = '' //  清除痕迹
   }
 }
 </script>

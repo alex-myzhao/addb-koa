@@ -1,19 +1,22 @@
 <template>
 <div id="manage">
-  <TopBar id="top-menu"></TopBar>
+  <TopBar id="top-menu" />
   <div id="manage-page-container">
-    <el-tabs class="manage-tabs" type="card">
+    <el-tabs
+      class="manage-tabs"
+      type="card"
+    >
       <el-tab-pane label="用户管理">
-        <UserManage></UserManage>
+        <UserManage/>
       </el-tab-pane>
       <el-tab-pane label="配置管理">
-        <ConfigManage></ConfigManage>
+        <ConfigManage/>
       </el-tab-pane>
       <!-- <el-tab-pane label="操作日志">
         <SystemLog></SystemLog>
       </el-tab-pane> -->
       <el-tab-pane label="更新日志">
-        <UpdateLog></UpdateLog>
+        <UpdateLog/>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -21,22 +24,21 @@
 </template>
 
 <script>
-import api from '../model/api.js'
-
-let id = 1000;
+import UserManage from '@/components/UserManage'
+import ConfigManage from '@/components/ConfigManage'
+import UpdateLog from '@/components/UpdateLog'
+import TopBar from '@/components/TopBar'
 
 export default {
-  data() {
+  data () {
     return {}
   },
   components: {
-    UserManage: require('../components/UserManage.vue'),
-    ConfigManage: require('../components/ConfigManage.vue'),
-    SystemLog: require('../components/SystemLog.vue'),
-    UpdateLog: require('../components/UpdateLog.vue'),
-    TopBar: require('../components/TopBar.vue')
-  },
-  methods: {}
+    UserManage,
+    ConfigManage,
+    UpdateLog,
+    TopBar
+  }
 }
 </script>
 

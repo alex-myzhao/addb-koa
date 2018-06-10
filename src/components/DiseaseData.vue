@@ -177,43 +177,18 @@
 </template>
 
 <script>
-import detailData from '../static/detailData.js'
-import api from '../model/api.js'
-import util from '../lib/util.js'
-import checker from '../lib/format-checker.js'
+import api from '@/utils/api'
+import util from '@/utils/util'
+import checker from '@/utils/format-checker'
+import ClientConfig from '@/client-config'
 
 export default {
   name: 'app',
   props: ['tree', 'idPath', 'nodeID', 'buff'],
-  data() {
+  data () {
     return {
-      uploadUrl: '//' + this.$store.state.config.baseURL + '/importtable',
-      form: {
-        DiseaseID: -1,
-        Species: '',
-        DiagnosticSymptoms: '',
-        DiagnosticBlood: '',
-        DiagnosticSkin: '',
-        DiagnosticStool: '',
-        NumSamples: '',
-        NumSpecimen: '',
-        AgeLower: '',
-        AgeUpper: '',
-        NumExamine: '',
-        NumPositive: '',
-        PercentPositive: '',
-        NumExamineMale: '',
-        NumPositiveMale: '',
-        PercentPositiveMale: '',
-        NumExamineFemale: '',
-        NumPositiveFemale: '',
-        PercentPositiveFemale: '',
-        Note4: '',
-        LocationInformationLocationID: '',
-        LReportID: -1,
-        LocationInformationSurveyDescriptionSurveyID: -1,
-        LocationInformationLocationID1: -1
-      },
+      uploadUrl: '//' + ClientConfig.BASE_URL + '/importtable',
+      form: null,
       informationOptions: [],
       dialogVisible: false,
       //  upload dialog
@@ -226,20 +201,20 @@ export default {
   },
   computed: {
     id: {
-      get() {
+      get () {
         return this.$store.state.treeID
       },
-      set(v) {
+      set (v) {
         this.$store.commit('updateTreeID', v)
       }
     },
-    uneditable: function() {
+    uneditable: function () {
       return this.$store.state.opt === 'view'
     },
-    editable: function() {
+    editable: function () {
       return this.$store.state.opt !== 'view'
     },
-    dialogMsg: function() {
+    dialogMsg: function () {
       return '确认删除Disease ' + this.nodeID + '？'
     }
   },
@@ -262,7 +237,7 @@ export default {
       }
       if (this.active++ > 4) this.active = 0
     },
-    onNext() {
+    onNext () {
       api.checkModified(() => {
         api.getId('Intervention Data')
           .then((res) => {
@@ -270,6 +245,7 @@ export default {
             util.appendNode.call(this, cur, res.data.id, 'InterventionID')
           })
           .catch((err) => {
+            console.error(err)
             this.$notify({
               title: '',
               message: '网络错误',
@@ -278,7 +254,7 @@ export default {
           })
       }, 'Disease Data', this)
     },
-    onSave() {
+    onSave () {
       var msg = checker.checkForm(this.form, 'Disease Data')
       if (msg !== '') {
         this.$notify({
@@ -290,13 +266,13 @@ export default {
       }
       api.add('Disease Data', this.form, this)
     },
-    onMenu() {
+    onMenu () {
       this.$router.push('/home')
     },
-    onCancel() {
+    onCancel () {
       util.deleteNode(this.tree.currentNode)
     },
-    onDelete() {
+    onDelete () {
       this.dialogVisible = true
     },
     onImport () {
@@ -309,17 +285,18 @@ export default {
         did: this.idPath[3]
       }
     },
-    deleteConfrim() {
+    deleteConfrim () {
       this.dialogVisible = false
       api.delete.call(this, this.nodeID, 'Disease Data')
     },
-    onAdd() {
+    onAdd () {
       api.getId('Disease Data')
         .then((res) => {
           var parent = this.tree.currentNode.$parent
           util.appendNode.call(this, parent, res.data.id, 'DiseaseID')
         })
         .catch((err) => {
+          console.error(err)
           this.$notify({
             title: '',
             message: '网络错误',
@@ -327,28 +304,41 @@ export default {
           })
         })
     },
-    onChangeItem() {
+    onChangeItem () {
       this.form.LReportID = this.idPath[0]
       this.form.LocationInformationSurveyDescriptionSurveyID = this.idPath[1]
       this.form.LocationInformationLocationID1 = this.idPath[2]
       this.form.DiseaseID = this.idPath[3]
     },
-    initForm() {
+    initForm () {
       this.form = {
         DiseaseID: this.idPath[3],
-        Species: '', DiagnosticSymptoms: '', DiagnosticBlood: '',
-        DiagnosticSkin: '', DiagnosticStool: '', NumSamples: '',
-        NumSpecimen: '', AgeLower: '', AgeUpper: '',
-        NumExamine: '', NumPositive: '', PercentPositive: '',
-        NumExamineMale: '', NumPositiveMale: '', PercentPositiveMale: '',
-        NumExamineFemale: '', NumPositiveFemale: '', PercentPositiveFemale: '',
-        Note4: '', LocationInformationLocationID: '',
+        Species: '',
+        DiagnosticSymptoms: '',
+        DiagnosticBlood: '',
+        DiagnosticSkin: '',
+        DiagnosticStool: '',
+        NumSamples: '',
+        NumSpecimen: '',
+        AgeLower: '',
+        AgeUpper: '',
+        NumExamine: '',
+        NumPositive: '',
+        PercentPositive: '',
+        NumExamineMale: '',
+        NumPositiveMale: '',
+        PercentPositiveMale: '',
+        NumExamineFemale: '',
+        NumPositiveFemale: '',
+        PercentPositiveFemale: '',
+        Note4: '',
+        LocationInformationLocationID: '',
         LReportID: this.idPath[0],
         LocationInformationSurveyDescriptionSurveyID: this.idPath[1],
         LocationInformationLocationID1: this.idPath[2]
       }
     },
-    updateData() {
+    updateData () {
       if (this.buff.D[this.nodeID] !== undefined) {
         this.form = this.buff.D[this.nodeID]
         this.loading = false
@@ -363,21 +353,22 @@ export default {
             this.loading = false
           })
           .catch((err) => {
+            console.error(err)
             this.initForm()
             this.loading = false
           })
       }
     }
   },
-  created: function() {
+  created: function () {
     this.updateData()
     this.informationOptions = this.$store.getters.informationOptions
   },
-  beforeDestroy: function() {
+  beforeDestroy: function () {
     this.$emit('getBuffer', 'D', this.nodeID, this.form)
   },
   watch: {
-    nodeID: function(val, oldVal) {
+    nodeID: function (val, oldVal) {
       this.$emit('getBuffer', 'D', oldVal, this.form)
       this.updateData()
       // this.onChangeItem()

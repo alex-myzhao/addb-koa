@@ -2,8 +2,12 @@
 <div class="control-panel">
   <el-row class="cc-title">
     <span>{{ optName }}</span>
-    <el-button class="cc-fold-btn" type="text"
-      :icon="!visiable ? 'arrow-down' : 'arrow-up'" @click="onUnfold"></el-button>
+    <el-button
+      class="cc-fold-btn"
+      type="text"
+      :icon="!visiable ? 'arrow-down' : 'arrow-up'"
+      @click="onUnfold"
+    />
   </el-row>
   <transition name="slide-fade" mode="out-in">
     <div v-show="visiable">
@@ -36,10 +40,10 @@
 </template>
 
 <script>
-import optionManager from '../model/optionManager'
+import optionManager from '@/utils/option-manager'
 
 export default {
-  data() {
+  data () {
     return {
       visiable: false,
       type: null,
@@ -66,7 +70,7 @@ export default {
       this.type = 'add'
     },
     onSubmit () {
-      if (this.type == 'delete') {
+      if (this.type === 'delete') {
         if (this.form.deleteItem === null || this.form.deleteItem === '') {
           this.$notify({ message: '请在左侧选中要删除的条目', type: 'warning' })
           return
@@ -79,8 +83,11 @@ export default {
                 this.update()
               })
           })
-          .catch((err) => { this.$notify({ message: '网络错误', type: 'warning' }) })
-      } else if (this.type = 'add') {
+          .catch((err) => {
+            console.error(err)
+            this.$notify({ message: '网络错误', type: 'warning' })
+          })
+      } else if (this.type === 'add') {
         if (this.form.addItem === null || this.form.addItem === '') {
           this.$notify({ message: '请在输入要添加的条目', type: 'warning' })
           return
@@ -93,7 +100,10 @@ export default {
                 this.update()
               })
           })
-          .catch((err) => { this.$notify({ message: '网络错误', type: 'warning' }) })
+          .catch((err) => {
+            console.error(err)
+            this.$notify({ message: '网络错误', type: 'warning' })
+          })
       }
 
       this.type = null

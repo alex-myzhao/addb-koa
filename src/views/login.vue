@@ -1,7 +1,12 @@
 <template>
 <div id="login">
   <h1 id="login-title">Welcome to Disease DB</h1>
-  <el-form :model="loginForm" :rules="loginRules" ref="loginForm" label-width="0px">
+  <el-form
+    :model="loginForm"
+    :rules="loginRules"
+    ref="loginForm"
+    label-width="0px"
+  >
     <div id="username-input">
       <el-form-item label="" prop="usernameInput">
         <el-input
@@ -43,7 +48,7 @@
     </el-form-item>
   </el-form>
 
-  <el-dialog title="Sign Up" v-model="dialogVisible" size="small">
+  <el-dialog title="Sign Up" :visible.sync="dialogVisible">
     <div id="login-dialog">
       <el-form
         :model="register"
@@ -79,7 +84,6 @@
           />
         </el-form-item>
       </el-form>
-      <!-- <span class="hint">*The new registered users are read-only ones. To create other types of users, please contact the administor.</span> -->
     </div>
     <span
       slot="footer"
@@ -114,25 +118,27 @@
 </template>
 
 <script>
-import api from '../model/api.js'
-import mailSender from '../model/mailSender.js'
+import api from '@/utils/api'
+import mailSender from '@/utils/mail-sender'
+
+import ClientConfig from '@/client-config'
 
 export default {
   name: 'login',
-  data() {
+  data () {
     var validatePass1 = (rule, value, callback) => {
-        if (value === '') {
-        callback(new Error('Please input your password'));
+      if (value === '') {
+        callback(new Error('Please input your password'))
       } else {
         if (this.register.confirm !== '') {
-        this.$refs.register.validateField('confirm')
-      }
+          this.$refs.register.validateField('confirm')
+        }
         callback()
       }
     }
     var validatePass2 = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('Please confirm your password'));
+        callback(new Error('Please confirm your password'))
       } else if (value !== this.register.password) {
         callback(new Error('Please confirm your password'))
       } else {
@@ -144,7 +150,7 @@ export default {
       //  login
       loginForm: {
         usernameInput: '',
-        passwordInput: '',
+        passwordInput: ''
       },
       loginRules: {
         usernameInput: [
@@ -177,10 +183,10 @@ export default {
   },
   computed: {
     version () {
-      return this.$store.state.config.version
+      return ClientConfig.VERSION
     },
     appName () {
-      return this.$store.state.config.appName
+      return ClientConfig.APP_NAME
     }
   },
   methods: {
@@ -189,7 +195,7 @@ export default {
         if (valid) {
           api.login(this.loginForm.usernameInput, this.loginForm.passwordInput)
             .then((res) => {
-              if (res.data.success == true) {
+              if (res.data.success) {
                 // console.log(res.data)
                 this.$store.commit('updateIslogin', true)
                 this.$store.commit('updateUserInfo', {
@@ -207,6 +213,7 @@ export default {
               }
             })
             .catch((err) => {
+              console.error(err)
               this.$notify({
                 title: '',
                 message: 'Login Failed',
@@ -240,7 +247,7 @@ export default {
                   message: 'Username already exists',
                   type: 'warning'
                 })
-                return Promise.reject()
+                return Promise.reject(new Error('Username already exists'))
               }
             })
             .then(res => {
@@ -249,11 +256,11 @@ export default {
                   // send a email
                 })
                 .catch(err => {
-                  console.log(err)
+                  console.error(err)
                 })
             })
             .catch((err) => {
-              console.log(err)
+              console.error(err)
               this.$notify({
                 title: 'Register Failed',
                 message: '',
@@ -262,7 +269,7 @@ export default {
             })
         } else {
           // console.log('error submit!!');
-          return false;
+          return false
         }
       })
     }

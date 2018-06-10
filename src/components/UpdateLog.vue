@@ -12,7 +12,7 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
       tableData: [{
         date: '2018-02-03',
@@ -95,8 +95,7 @@ export default {
       }],
       showHead: false
     }
-  },
-  methods: {}
+  }
 }
 </script>
 

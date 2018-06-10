@@ -33,7 +33,12 @@
       <el-col :span="12">
         <el-form-item label="PointType">
           <el-select v-model="form.PointType" placeholder="Point Type" :readonly="uneditable" v-if="!uneditable">
-            <el-option v-for="item in pointTypeOptions" :label="item" :value="item"></el-option>
+            <el-option
+              v-for="item in pointTypeOptions"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
           </el-select>
           <el-input placeholder="Point Type" v-model="form.PointType" :readonly="uneditable" v-else></el-input>
         </el-form-item>
@@ -41,7 +46,12 @@
       <el-col :span="12">
         <el-form-item label="GeoRef">
           <el-select v-model="form.GeoReferenceSources" placeholder="Point Type" :readonly="uneditable" v-if="!uneditable">
-            <el-option v-for="item in grSourceOptions" :label="item" :value="item"></el-option>
+            <el-option
+              v-for="item in grSourceOptions"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
           </el-select>
           <el-input placeholder="Geo Reference Sources" v-model="form.GeoReferenceSources" :readonly="uneditable" v-else></el-input>
         </el-form-item>
@@ -104,15 +114,14 @@
 </template>
 
 <script>
-import detailData from '../static/detailData.js'
-import api from '../model/api.js'
-import util from '../lib/util.js'
-import checker from '../lib/format-checker.js'
+import api from '@/utils/api'
+import util from '@/utils/util'
+import checker from '@/utils/format-checker'
 
 export default {
   name: 'app',
   props: ['tree', 'idPath', 'nodeID', 'buff'],
-  data() {
+  data () {
     return {
       uploadUrl: '//' + this.$store.state.config.baseURL + '/importtable',
       form: {
@@ -130,7 +139,7 @@ export default {
         Note3: ''
       },
       grSourceOptions: [],
-      pointTypeOptions: detailData.locationDetail.pointTypeOptions,
+      pointTypeOptions: [],
       dialogVisible: false,
       //  upload dialog
       dialogUploadVisible: false,
@@ -141,20 +150,20 @@ export default {
   },
   computed: {
     id: {
-      get() {
+      get () {
         return this.$store.state.treeID
       },
-      set(v) {
+      set (v) {
         this.$store.commit('updateTreeID', v)
       }
     },
-    uneditable: function() {
+    uneditable: function () {
       return this.$store.state.opt === 'view'
     },
-    editable: function() {
+    editable: function () {
       return this.$store.state.opt !== 'view'
     },
-    dialogMsg: function() {
+    dialogMsg: function () {
       return '确认删除Location ' + this.nodeID + '？'
     }
   },
@@ -178,7 +187,7 @@ export default {
       }
       if (this.active++ > 4) this.active = 0
     },
-    onNext() {
+    onNext () {
       api.checkModified(() => {
         api.getId('Disease Data')
           .then((res) => {
@@ -186,6 +195,7 @@ export default {
             util.appendNode.call(this, cur, res.data.id, 'DiseaseID')
           })
           .catch((err) => {
+            console.error(err)
             this.$notify({
               title: '',
               message: '网络错误',
@@ -194,7 +204,7 @@ export default {
           })
       }, 'Location Information', this)
     },
-    onSave() {
+    onSave () {
       var msg = checker.checkForm(this.form, 'Location Information')
       if (msg !== '') {
         this.$notify({
@@ -206,13 +216,13 @@ export default {
       }
       api.add('Location Information', this.form, this)
     },
-    onMenu() {
+    onMenu () {
       this.$router.push('/home')
     },
-    onCancel() {
+    onCancel () {
       util.deleteNode(this.tree.currentNode)
     },
-    onDelete() {
+    onDelete () {
       this.dialogVisible = true
     },
     onImport () {
@@ -224,17 +234,18 @@ export default {
         lid: this.idPath[2]
       }
     },
-    deleteConfrim() {
+    deleteConfrim () {
       this.dialogVisible = false
       api.delete.call(this, this.nodeID, 'Location Information')
     },
-    onAdd() {
+    onAdd () {
       api.getId('Location Information')
         .then((res) => {
           var parent = this.tree.currentNode.$parent
           util.appendNode.call(this, parent, res.data.id, 'LocationID')
         })
         .catch((err) => {
+          console.error(err)
           this.$notify({
             title: '',
             message: '网络错误',
@@ -242,7 +253,7 @@ export default {
           })
         })
     },
-    initForm() {
+    initForm () {
       this.form = {
         LocationID: this.idPath[2],
         SurveyDescriptionBasicSourcesReportID: this.idPath[0],
@@ -258,7 +269,7 @@ export default {
         Note3: ''
       }
     },
-    updateData() {
+    updateData () {
       if (this.buff.L[this.nodeID] !== undefined) {
         this.form = this.buff.L[this.nodeID]
         this.loading = false
@@ -273,21 +284,33 @@ export default {
             this.loading = false
           })
           .catch((err) => {
+            console.error(err)
             this.initForm()
             this.loading = false
           })
       }
     }
   },
-  created: function() {
+  created: function () {
     this.updateData()
     this.grSourceOptions = this.$store.getters.grSourceOptions
+    this.pointTypeOptions = [
+      'school',
+      'village',
+      'town',
+      'county',
+      'area',
+      'region',
+      'AMD3',
+      'ADM2',
+      'ADM1'
+    ]
   },
-  beforeDestroy: function() {
+  beforeDestroy: function () {
     this.$emit('getBuffer', 'L', this.nodeID, this.form)
   },
   watch: {
-    nodeID: function(val, oldVal) {
+    nodeID: function (val, oldVal) {
       this.$emit('getBuffer', 'L', oldVal, this.form)
       this.updateData()
     }

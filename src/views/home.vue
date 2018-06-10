@@ -1,6 +1,6 @@
 <template>
 <div id="home">
-  <TopBar id="top-menu"></TopBar>
+  <TopBar id="top-menu"/>
   <div id="page-container">
     <!-- <h1>{{ helloMsg }}</h1> -->
     <el-input
@@ -54,13 +54,60 @@
       />
     </el-select>
     <el-button-group id="home-button-group">
-      <el-button class="home-button" @click="onSearch" icon="search">Search</el-button>
-      <el-button class="home-button" @click="onBatchExport" icon="share">Export</el-button>
-      <el-button class="home-button" @click="onBatchInput" icon="upload2" v-show="canEdit">Import</el-button>
-      <el-button class="home-button" @click="onView" icon="view">View</el-button>
-      <el-button class="home-button" @click="onEdit" icon="edit" v-show="canEdit">Edit</el-button>
-      <el-button class="home-button" @click="onDelete" icon="delete" v-show="canEdit">Delete</el-button>
-      <el-button class="home-button" type="primary" @click="onNew" icon="plus" v-show="canEdit">New</el-button>
+      <el-button
+        class="home-button"
+        @click="onSearch"
+        icon="search"
+      >
+        Search
+      </el-button>
+      <el-button
+        class="home-button"
+        @click="onBatchExport"
+        icon="share"
+      >
+        Export
+      </el-button>
+      <el-button
+        class="home-button"
+        @click="onBatchInput"
+        icon="upload2"
+        v-show="canEdit"
+      >
+        Import
+      </el-button>
+      <el-button
+        class="home-button"
+        @click="onView"
+        icon="view"
+      >
+        View
+      </el-button>
+      <el-button
+        class="home-button"
+        @click="onEdit"
+        icon="edit"
+        v-show="canEdit"
+      >
+        Edit
+      </el-button>
+      <el-button
+        class="home-button"
+        @click="onDelete"
+        icon="delete"
+        v-show="canEdit"
+      >
+        Delete
+      </el-button>
+      <el-button
+        class="home-button"
+        type="primary"
+        @click="onNew"
+        icon="plus"
+        v-show="canEdit"
+      >
+        New
+      </el-button>
     </el-button-group>
     <div class="home-table-container">
       <el-table
@@ -68,10 +115,12 @@
         :data="tableData"
         highlight-current-row
         align="center"
-        @current-change="handleCurrentChange" @row-dblclick="doubleClickEvent"
+        @current-change="handleCurrentChange"
+        @row-dblclick="doubleClickEvent"
         @selection-change="handleSelectionChange"
         :default-sort = "{ prop: 'id', order: 'descending' }"
-        v-loading="isLoading" element-loading-text="Searching"
+        v-loading="isLoading"
+        element-loading-text="Searching"
       >
         <el-table-column type="selection" width="55" sortable></el-table-column>
         <el-table-column property="id" label="id" width="90" sortable></el-table-column>
@@ -135,15 +184,16 @@
 </template>
 
 <script>
-import detailData from '../static/detailData.js'
-import api from '../model/api.js'
+import api from '@/utils/api.js'
+import ClientConfig from '@/client-config'
+import TopBar from '@/components/TopBar'
 
 export default {
   name: 'home',
-  data() {
+  data () {
     return {
       //  download url
-      importUrl: '//' + this.$store.state.config.baseURL + '/importexcel',
+      importUrl: '//' + ClientConfig.BASE_URL + '/importexcel',
       //  search conditions
       conditions: {
         searchID: null,
@@ -153,8 +203,8 @@ export default {
         doubleClick: ''
       },
       //  options
-      diseaseOptions: detailData.basicDetail.diseaseOptions,
-      countryOptions: detailData.basicDetail.countryOptions,
+      diseaseOptions: [],
+      countryOptions: [],
       clickOptions: ['Yes', 'No'],
       // table
       tableData: [],
@@ -172,46 +222,46 @@ export default {
     }
   },
   components: {
-    TopBar: require('../components/TopBar.vue')
+    TopBar
   },
   computed: {
-    helloMsg: function() {
+    helloMsg: function () {
       return 'Hello, ' + this.$store.state.userInfo.username
     },
     opt: {
-      get() { return this.$store.state.opt },
-      set(v) { this.$store.commit('updateOpt', v) }
+      get () { return this.$store.state.opt },
+      set (v) { this.$store.commit('updateOpt', v) }
     },
     editID: {
-      get() { return this.$store.state.editID },
-      set(v) { this.$store.commit('updateEditID', v) }
+      get () { return this.$store.state.editID },
+      set (v) { this.$store.commit('updateEditID', v) }
     },
     viewID: {
-      get() { return this.$store.state.viewID },
-      set(v) { this.$store.commit('updateViewID', v) }
+      get () { return this.$store.state.viewID },
+      set (v) { this.$store.commit('updateViewID', v) }
     },
-    dialogTitle: function() {
+    dialogTitle: function () {
       if (this.active >= 5) {
         return 'Done~'
       }
       return 'Please Upload ' + this.hints[this.active]
     },
-    uploadHint: function() {
+    uploadHint: function () {
       if (this.active >= 5) {
         return 'You can close this dialog now'
       }
       return this.hints[this.active] + ' file needed, .xls/.xlsx support only'
     },
-    canUpload: function() {
+    canUpload: function () {
       return this.active < 5
     },
-    payload: function() {
+    payload: function () {
       return {
         id: this.active,
         username: this.$store.state.userInfo.username
       }
     },
-    canEdit: function() {
+    canEdit: function () {
       return this.$store.state.userInfo.authority <= 3
     }
   },
@@ -238,17 +288,17 @@ export default {
       }
     },
     // table
-    doubleClickEvent(row, e) {
+    doubleClickEvent (row, e) {
       if (this.canEdit) {
         this.onEdit()
       } else {
         this.onView()
       }
     },
-    handleCurrentChange (val) {  //  记录当前选中的行
+    handleCurrentChange (val) { // 记录当前选中的行
       this.currentRow = val
     },
-    handleSelectionChange (val) {  //  记录当前选中的所有行(多选)
+    handleSelectionChange (val) { // 记录当前选中的所有行(多选)
       this.resultMultipleSelection = val
     },
     onBatchInput () {
@@ -267,22 +317,22 @@ export default {
         })
         return
       }
-      var url = 'http://' + this.$store.state.config.baseURL + '/exportexcel?'
+      var url = `http://${ClientConfig.BASE_URL}/exportexcel?`
       // var url = 'http://' + this.$store.state.baseHost + ':3000/exportexcel?'
       for (let i in ids) {
         url += 'id' + i + '=' + ids[i]
-        if (i != ids.length - 1) {
+        if (i !== ids.length - 1) {
           url += '&'
         }
       }
-      var x = document.getElementById("getexcel")
+      var x = document.getElementById('getexcel')
       x.href = url
       x.click()
     },
     onView () {
       if (this.currentRow == null) {
         this.$alert('请选中需要查看的条目', '未选中任何条目',
-          { confirmButtonText: '确定', callback: action => {} });
+          { confirmButtonText: '确定', callback: action => {} })
       } else {
         this.opt = 'view'
         this.viewID = this.currentRow.id
@@ -319,23 +369,26 @@ export default {
         return
       }
       this.$confirm('即将删除Report:  ' + confirmDeleteReports + ', 是否继续?', '警告', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
           for (let i in ids) {
             api.delete.call(this, ids[i], 'Basic Sources')
           }
           this.onSearch()
-        }).catch(() => {
+        })
+        .catch((err) => {
           //  donothing
+          console.error(err)
         })
     },
-    onNew() {
+    onNew () {
       this.opt = 'new'
       this.$router.push('/detail')
     },
-    onSearch() {
+    onSearch () {
       if (this.isEmpty(this.conditions.searchID) && this.isEmpty(this.conditions.dValue) &&
           this.isEmpty(this.conditions.cValue) && this.isEmpty(this.conditions.yValue) &&
           this.isEmpty(this.conditions.doubleClick)) {
@@ -347,20 +400,31 @@ export default {
       that.isLoading = true
       var yearArr = String(this.conditions.yValue).split(' ')
       api.query(this.conditions.searchID, {
-        disease: this.conditions.dValue == '' ? null : this.conditions.dValue,
-        country: this.conditions.cValue == '' ? null : this.conditions.cValue,
-        year: this.conditions.yValue == '' ? null : parseInt(yearArr[3]),
-        doubleClick: this.conditions.doubleClick == '' ? null : (this.conditions.doubleClick == 'Yes' ? 'Yes' : 'No')
+        disease: this.conditions.dValue === '' ? null : this.conditions.dValue,
+        country: this.conditions.cValue === '' ? null : this.conditions.cValue,
+        year: this.conditions.yValue === '' ? null : parseInt(yearArr[3]),
+        doubleClick: this.conditions.doubleClick === '' ? null : (this.conditions.doubleClick === 'Yes' ? 'Yes' : 'No')
       }, this.$store.state.userInfo.authority, that)
     },
     downloadDemo () {
       var url = 'http://' + this.$store.state.config.baseURL + '/exportdemo'
-      var x = document.getElementById("getdemo")
+      var x = document.getElementById('getdemo')
       x.href = url
       x.click()
     }
   },
-  created: function() {
+  created: function () {
+    if (this.$store.state.options.options === null) {
+      this.$store.dispatch('updateOpt')
+        .then(() => {
+          this.diseaseOptions = this.$store.getters.diseaseOptions
+          this.countryOptions = this.$store.getters.countryOptions
+        })
+    } else {
+      this.diseaseOptions = this.$store.getters.diseaseOptions
+      this.countryOptions = this.$store.getters.countryOptions
+    }
+
     if (this.$store.state.homeTableBuff !== null) {
       this.tableData = this.$store.state.homeTableBuff
       this.conditions.searchID = this.$store.state.homeConditionsBuff.searchID
@@ -370,15 +434,11 @@ export default {
       this.conditions.doubleClick = this.$store.state.homeConditionsBuff.doubleClick
     }
     this.onSearch()
-
-    if (this.$store.state.options.options === null) {
-      this.$store.dispatch('updateOpt')
-    }
   },
-  beforeDestroy: function() {
+  beforeDestroy: function () {
     this.$store.commit('updateHomeTableBuff', this.tableData)
     this.$store.commit('updateHomeConditionsBuff', this.conditions)
-  },
+  }
 }
 </script>
 

@@ -8,9 +8,17 @@
     <el-row :gutter="10">
       <el-col :span="12">
           <el-form-item label="DataType">
-            <el-select v-model="form.DataType" placeholder="Data Type" :readonly="uneditable" v-if="!uneditable">
-              <el-option v-for="item in dataTypeOptions" :label="item"
-                         :value="item"></el-option>
+            <el-select
+              v-model="form.DataType"
+              placeholder="Data Type"
+              :readonly="uneditable"
+              v-if="!uneditable">
+              <el-option
+                v-for="item in dataTypeOptions"
+                :key="item"
+                :label="item"
+                :value="item"
+              />
             </el-select>
             <el-input placeholder="Data Type" v-model="form.DataType" :readonly="uneditable" v-else></el-input>
           </el-form-item>
@@ -18,8 +26,12 @@
       <el-col :span="12">
         <el-form-item label="SurveyType">
           <el-select v-model="form.SurveyType" placeholder="Survey Type" :readonly="uneditable" v-if="!uneditable">
-            <el-option v-for="item in surveyTypeOptions"
-                       :label="item" :value="item"></el-option>
+            <el-option
+              v-for="item in surveyTypeOptions"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
           </el-select>
           <el-input placeholder="Survey Type" v-model="form.SurveyType" :readonly="uneditable" v-else></el-input>
         </el-form-item>
@@ -29,8 +41,12 @@
       <el-col :span="12">
           <el-form-item label="MonthStart">
             <el-select v-model="form.MonthStart" placeholder="Month Start" :readonly="uneditable" v-if="!uneditable">
-              <el-option v-for="item in monthOptions"
-                         :label="item" :value="item"></el-option>
+              <el-option
+                v-for="item in monthOptions"
+                :key="item"
+                :label="item"
+                :value="item"
+              />
             </el-select>
             <el-input placeholder="Month Start" v-model="form.MonthStart" :readonly="uneditable" v-else></el-input>
           </el-form-item>
@@ -38,8 +54,12 @@
       <el-col :span="12">
         <el-form-item label="MonthFinish">
           <el-select v-model="form.MonthFinish" placeholder="Month Finish" :readonly="uneditable" v-if="!uneditable">
-            <el-option v-for="item in monthOptions"
-                       :label="item" :value="item"></el-option>
+            <el-option
+              v-for="item in monthOptions"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
           </el-select>
           <el-input placeholder="Month Finish" v-model="form.MonthFinish" :readonly="uneditable" v-else></el-input>
         </el-form-item>
@@ -102,31 +122,22 @@
 </template>
 
 <script>
-import detailData from '../static/detailData.js'
-import api from '../model/api.js'
-import util from '../lib/util.js'
-import checker from '../lib/format-checker.js'
+import api from '@/utils/api'
+import util from '@/utils/util'
+import checker from '@/utils/format-checker'
+
+import ClientConfig from '@/client-config'
 
 export default {
   name: 'app',
   props: ['tree', 'idPath', 'nodeID', 'buff'],
-  data() {
+  data () {
     return {
-      uploadUrl: '//' + this.$store.state.config.baseURL + '/importtable',
-      form: {
-        SurveyID: -1,                // survey id, 自动生成的随机值，从数据库获取
-        BasicSourcesReportID: -1,    // get from father
-        DataType: '',
-        SurveyType: '',
-        MonthStart: '',
-        MonthFinish: '',
-        YearStart: '',
-        YearFinish: '',
-        Note2: ''
-      },
-      dataTypeOptions: detailData.surveyDetail.dataTypeOptions,
-      surveyTypeOptions: detailData.surveyDetail.surveyTypeOptions,
-      monthOptions: detailData.surveyDetail.monthOptions,
+      uploadUrl: '//' + ClientConfig.BASE_URL + '/importtable',
+      form: null,
+      dataTypeOptions: [],
+      surveyTypeOptions: [],
+      monthOptions: [],
       dialogVisible: false,
       //  upload dialog
       dialogUploadVisible: false,
@@ -138,20 +149,20 @@ export default {
   },
   computed: {
     id: {
-      get() {
+      get () {
         return this.$store.state.treeID
       },
-      set(v) {
+      set (v) {
         this.$store.commit('updateTreeID', v)
       }
     },
-    uneditable: function() {
+    uneditable: function () {
       return this.$store.state.opt === 'view'
     },
-    editable: function() {
+    editable: function () {
       return this.$store.state.opt !== 'view'
     },
-    dialogMsg: function() {
+    dialogMsg: function () {
       return '确认删除Survey ' + this.nodeID + '？'
     }
   },
@@ -175,7 +186,7 @@ export default {
       }
       if (this.active++ > 4) this.active = 0
     },
-    onNext() {
+    onNext () {
       api.checkModified(() => {
         api.getId('Location Information')
           .then((res) => {
@@ -188,11 +199,11 @@ export default {
               message: '网络错误',
               type: 'warning'
             })
-            // console.log(err)
+            console.error(err)
           })
       }, 'Survey Description', this)
     },
-    onSave() {
+    onSave () {
       var msg = checker.checkForm(this.form, 'Survey Description')
       if (msg === '') {
         if (this.form.YearStart > this.form.YearFinish) {
@@ -210,14 +221,14 @@ export default {
       }
       api.add('Survey Description', this.form, this)
     },
-    onMenu() {
+    onMenu () {
       this.$router.push('/home')
     },
     //  回退上一节点，删除本节点
-    onCancel() {
+    onCancel () {
       util.deleteNode(this.tree.currentNode)
     },
-    onDelete() {
+    onDelete () {
       this.dialogVisible = true
     },
     onImport () {
@@ -228,17 +239,18 @@ export default {
         sid: this.idPath[1]
       }
     },
-    deleteConfrim() {
+    deleteConfrim () {
       this.dialogVisible = false
       api.delete.call(this, this.nodeID, 'Survey Description')
     },
-    onAdd() {
+    onAdd () {
       api.getId('Survey Description')
         .then((res) => {
           var parent = this.tree.currentNode.$parent
           util.appendNode.call(this, parent, res.data.id, 'SurveyID')
         })
         .catch((err) => {
+          console.error(err)
           this.$notify({
             title: '',
             message: '网络错误',
@@ -246,14 +258,20 @@ export default {
           })
         })
     },
-    initForm() {
+    initForm () {
       this.form = {
-        SurveyID: this.idPath[1], BasicSourcesReportID: this.idPath[0], DataType: '',
-        SurveyType: '', MonthStart: '', MonthFinish: '',
-        YearStart: '', YearFinish: '', Note2: ''
+        SurveyID: this.idPath[1],
+        BasicSourcesReportID: this.idPath[0],
+        DataType: '',
+        SurveyType: '',
+        MonthStart: '',
+        MonthFinish: '',
+        YearStart: '',
+        YearFinish: '',
+        Note2: ''
       }
     },
-    updateData() {
+    updateData () {
       if (this.buff.S[this.nodeID] !== undefined) {
         this.form = this.buff.S[this.nodeID]
         this.loading = false
@@ -268,20 +286,39 @@ export default {
             this.loading = false
           })
           .catch((err) => {
+            console.error(err)
             this.initForm()
             this.loading = false
           })
       }
     }
   },
-  created: function() {
+  created: function () {
     this.updateData()
+    this.dataTypeOptions = [
+      'prevalence',
+      'incidence',
+      'outbreak',
+      'others'
+    ]
+    this.surveyTypeOptions = [
+      'community',
+      'school-based',
+      'hospital-based',
+      'under-school-aged children',
+      'others'
+    ]
+    this.monthOptions = [
+      'Jan', 'Feb', 'Mar', 'Apr',
+      'May', 'Jun', 'Jul', 'Aug',
+      'Sep', 'Oct', 'Nov', 'Dec'
+    ]
   },
-  beforeDestroy: function() {
+  beforeDestroy: function () {
     this.$emit('getBuffer', 'S', this.nodeID, this.form)
   },
   watch: {
-    nodeID: function(val, oldVal) {
+    nodeID: function (val, oldVal) {
       this.$emit('getBuffer', 'S', oldVal, this.form)
       this.updateData()
     }

@@ -9,7 +9,12 @@
       <el-col :span="8">
         <el-form-item label="Group">
           <el-select v-model="form.Group" placeholder="Group" :readonly="uneditable" v-if="!uneditable">
-            <el-option v-for="item in groupOptions" :label="item" :value="item"></el-option>
+            <el-option
+              v-for="item in groupOptions"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
           </el-select>
           <el-input v-model="form.Group" :readonly="uneditable" v-else></el-input>
         </el-form-item>
@@ -132,41 +137,17 @@
 </template>
 
 <script>
-import detailData from '../static/detailData.js'
-import api from '../model/api.js'
-import util from '../lib/util.js'
-import checker from '../lib/format-checker.js'
+import api from '@/utils/api'
+import util from '@/utils/util'
+import checker from '@/utils/format-checker'
 
 export default {
   name: 'app',
   props: ['tree', 'idPath', 'nodeID', 'buff'],
-  data() {
+  data () {
     return {
-      form: {
-        InterventionID: -1,
-        Group: '',
-        MonthsAfterBaseline: '',
-        Drug: '',
-        FrequencyPerYear: '',
-        PeriodMonths: '',
-        Coverage: '',
-        OtherMethod: '',
-        INumExamine: '',
-        INumPositive: '',
-        IPercentPositive: '',
-        INumExamineMale: '',
-        INumPositiveMale: '',
-        IPercentPositiveMale: '',
-        INumExamineFemale: '',
-        INumPositiveFemale: '',
-        IPercentPositiveFemale: '',
-        Note5: '',
-        DiseaseDataDiseaseID: -1,
-        DiseaseDataLocationInformationLocationID1: -1,
-        DiseaseDataLReportID: -1,
-        DiseaseDataLocationInformationSurveyDescriptionSurveyID: -1
-      },
-      groupOptions: detailData.interventionDetail.groupOptions,
+      form: null,
+      groupOptions: [],
       dialogVisible: false,
 
       loading: true
@@ -174,25 +155,25 @@ export default {
   },
   computed: {
     id: {
-      get() {
+      get () {
         return this.$store.state.treeID
       },
-      set(v) {
+      set (v) {
         this.$store.commit('updateTreeID', v)
       }
     },
-    uneditable: function() {
+    uneditable: function () {
       return this.$store.state.opt === 'view'
     },
-    editable: function() {
+    editable: function () {
       return this.$store.state.opt !== 'view'
     },
-    dialogMsg: function() {
+    dialogMsg: function () {
       return '确认删除Intervention ' + this.nodeID + '？'
     }
   },
   methods: {
-    onSave() {
+    onSave () {
       var msg = checker.checkForm(this.form, 'Intervention Data')
       if (msg !== '') {
         this.$notify({
@@ -204,19 +185,20 @@ export default {
       }
       api.add('Intervention Data', this.form, this)
     },
-    onMenu() {
+    onMenu () {
       this.$router.push('/home')
     },
-    onCancel() {
+    onCancel () {
       util.deleteNode(this.tree.currentNode)
     },
-    onAdd() {
+    onAdd () {
       api.getId('Intervention Data')
         .then((res) => {
           var parent = this.tree.currentNode.$parent
           util.appendNode.call(this, parent, res.data.id, 'InterventionID')
         })
         .catch((err) => {
+          console.error(err)
           this.$notify({
             title: '',
             message: '网络错误',
@@ -224,29 +206,40 @@ export default {
           })
         })
     },
-    onDelete() {
+    onDelete () {
       this.dialogVisible = true
     },
-    deleteConfrim() {
+    deleteConfrim () {
       this.dialogVisible = false
       api.delete.call(this, this.nodeID, 'Intervention Data')
     },
-    initForm() {
+    initForm () {
       this.form = {
         InterventionID: this.idPath[4],
-        Group: '', MonthsAfterBaseline: '', Drug: '',
-        FrequencyPerYear: '', PeriodMonths: '', Coverage: '',
-        OtherMethod: '', Note5: '',
-        INumExamine: '', INumPositive: '', IPercentPositive: '',
-        INumExamineMale: '', INumPositiveMale: '', IPercentPositiveMale: '',
-        INumExamineFemale: '', INumPositiveFemale: '', IPercentPositiveFemale: '',
+        Group: '',
+        MonthsAfterBaseline: '',
+        Drug: '',
+        FrequencyPerYear: '',
+        PeriodMonths: '',
+        Coverage: '',
+        OtherMethod: '',
+        Note5: '',
+        INumExamine: '',
+        INumPositive: '',
+        IPercentPositive: '',
+        INumExamineMale: '',
+        INumPositiveMale: '',
+        IPercentPositiveMale: '',
+        INumExamineFemale: '',
+        INumPositiveFemale: '',
+        IPercentPositiveFemale: '',
         DiseaseDataDiseaseID: this.idPath[3],
         DiseaseDataLocationInformationLocationID1: this.idPath[2],
         DiseaseDataLReportID: this.idPath[0],
         DiseaseDataLocationInformationSurveyDescriptionSurveyID: this.idPath[1]
       }
     },
-    updateData() {
+    updateData () {
       if (this.buff.I[this.nodeID] !== undefined) {
         this.form = this.buff.I[this.nodeID]
         this.loading = false
@@ -261,20 +254,24 @@ export default {
             this.loading = false
           })
           .catch((err) => {
+            console.error(err)
             this.initForm()
             this.loading = false
           })
       }
     }
   },
-  created: function() {
+  created: function () {
     this.updateData()
+    this.groupOptions = [
+      'intervention group', 'control group', 'others'
+    ]
   },
-  beforeDestroy: function() {
+  beforeDestroy: function () {
     this.$emit('getBuffer', 'I', this.nodeID, this.form)
   },
   watch: {
-    nodeID: function(val, oldVal) {
+    nodeID: function (val, oldVal) {
       this.$emit('getBuffer', 'I', oldVal, this.form)
       this.updateData()
     }

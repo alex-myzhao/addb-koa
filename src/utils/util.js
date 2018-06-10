@@ -1,5 +1,5 @@
 export default {
-  //  扩展对树形控件的操作
+  // 扩展对树形控件的操作
   appendNode: function (parent, nextId, typeString) {
     var key = -1
     var parentNode = parent.node
@@ -9,14 +9,14 @@ export default {
       children: [],
       dataID: nextId
     }
-    if (parentNode === undefined) {  //  parentNode is the root of the tree
+    if (parentNode === undefined) { //  parentNode is the root of the tree
       this.tree.root.store.append(nodeToAppend)
       key = this.tree.root.childNodes.length - 1
-    } else {                         //  parentNode is a leaf
+    } else { //  parentNode is a leaf
       parentNode.store.append(nodeToAppend, parentNode.data)
       key = parentNode.childNodes.length
     }
-    //  click the created node
+    // click the created node
     setTimeout(() => { parent.$children[key].handleClick() }, 0)
   },
   deleteNode: function (cur) {
@@ -29,7 +29,7 @@ export default {
     }
     curNode.store.remove(curNode.data)
   },
-  //  获取表名对应的缩写
+  // 获取表名对应的缩写
   getShortTypeName: function (type) {
     switch (type) {
       case 'ReportID':
@@ -51,7 +51,7 @@ export default {
         return 'Not Match'
     }
   },
-  //  返回对应类型数据表的ID，若type对应表不存在，返回-1
+  // 返回对应类型数据表的ID，若type对应表不存在，返回-1
   getID (type, data) {
     switch (type) {
       case 'ReportID':

@@ -53,10 +53,9 @@
             <el-option v-for="item in options" :key="item.label" :label="item.label" :value="item.value"/>>
           </el-select>
         </el-form-item>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit">确定</el-button>
-      </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onSubmit">确定</el-button>
+        </el-form-item>
       </el-form>
     </el-col>
   </el-row>
@@ -66,12 +65,12 @@
 <script>
 import md5 from 'md5'
 
-import manager from '../model/manager.js'
+import manager from '@/utils/manager.js'
 
 let authorityMap = [ 'Root', 'Administrator', 'Internal User', 'External User', 'Visiter' ]
 
 export default {
-  data() {
+  data () {
     return {
       options: [
         { label: 'Administrator', value: 1 },
@@ -108,58 +107,130 @@ export default {
         return
       }
       switch (this.operationType) {
-        case 1:  //  reset password
+        case 1: // reset password
           manager.modifyPassword(this.operationForm.username, this.operationForm.password, {
             name: this.$store.state.userInfo.username,
             password: md5(this.managerPassword)
           })
-          .then((res) => {
-            if (res.data.success === true) { this.$notify({ title: '更新成功', message: '', type: 'success'}) }
-            else { this.$notify({ title: '操作失败', message: '管理员密码错误', type: 'warning'}) }
-          })
-          .catch((err) => { this.$notify({ title: '操作失败', message: '', type: 'warning'}) })
+            .then((res) => {
+              if (res.data.success === true) {
+                this.$notify({
+                  title: '更新成功',
+                  message: '',
+                  type: 'success'
+                })
+              } else {
+                this.$notify({
+                  title: '操作失败',
+                  message: '管理员密码错误',
+                  type: 'warning'
+                })
+              }
+            })
+            .catch((err) => {
+              console.error(err)
+              this.$notify({
+                title: '操作失败',
+                message: '',
+                type: 'warning'
+              })
+            })
           break
-        case 2:  //  change authority
+        case 2: // change authority
           manager.modifyAuthority(
             this.operationForm.username,
             parseInt(this.operationForm.authority), {
               name: this.$store.state.userInfo.username,
               password: md5(this.managerPassword)
-          })
-          .then((res) => {
-            if (res.data.success === true) { this.$notify({ title: '更新成功', message: '', type: 'success'}) }
-            else {   this.$notify({ title: '操作失败', message: '管理员密码错误', type: 'warning'}) }
-            this.onSearch()
-          })
-          .catch((err) => { this.$notify({ title: '操作失败', message: '', type: 'warning'}) })
+            })
+            .then((res) => {
+              if (res.data.success === true) {
+                this.$notify({
+                  title: '更新成功',
+                  message: '',
+                  type: 'success'
+                })
+              } else {
+                this.$notify({
+                  title: '操作失败',
+                  message: '管理员密码错误',
+                  type: 'warning'
+                })
+              }
+              this.onSearch()
+            })
+            .catch((err) => {
+              console.error(err)
+              this.$notify({
+                title: '操作失败',
+                message: '',
+                type: 'warning'
+              })
+            })
           break
-        case 3:  //  add user
-        manager.addUser(
-          this.operationForm.newUsername,
-          this.operationForm.password,
-          parseInt(this.operationForm.authority), {
-            name: this.$store.state.userInfo.username,
-            password: md5(this.managerPassword)
-          })
-          .then((res) => {
-            if (res.data.success === true) { this.$notify({ title: '添加成功', message: '', type: 'success'}) }
-            else {   this.$notify({ title: '操作失败', message: '管理员密码错误', type: 'warning'}) }
-            this.onSearch()
-          })
-          .catch((err) => { this.$notify({ title: '操作失败', message: '', type: 'warning'}) })
+        case 3: // add user
+          manager.addUser(
+            this.operationForm.newUsername,
+            this.operationForm.password,
+            parseInt(this.operationForm.authority), {
+              name: this.$store.state.userInfo.username,
+              password: md5(this.managerPassword)
+            })
+            .then((res) => {
+              if (res.data.success === true) {
+                this.$notify({
+                  title: '添加成功',
+                  message: '',
+                  type: 'success'
+                })
+              } else {
+                this.$notify({
+                  title: '操作失败',
+                  message: '管理员密码错误',
+                  type: 'warning'
+                })
+              }
+              this.onSearch()
+            })
+            .catch((err) => {
+              console.error(err)
+              this.$notify({
+                title: '操作失败',
+                message: '',
+                type: 'warning'
+              })
+            })
           break
-        case 4:  //  delete user
-        manager.deleteUser(
-          this.operationForm.username, {
-            name: this.$store.state.userInfo.username,
-            password: md5(this.managerPassword)
-          })
-          .then((res) => {
-            if (res.data.success === true) { this.$notify({ title: '删除成功', message: '', type: 'success'}) }
-            else {   this.$notify({ title: '操作失败', message: '管理员密码错误', type: 'warning'}) }
-            this.onSearch()
-          })
-          .catch((err) => { this.$notify({ title: '操作失败', message: '', type: 'warning'}) })
+        case 4: // delete user
+          manager.deleteUser(
+            this.operationForm.username, {
+              name: this.$store.state.userInfo.username,
+              password: md5(this.managerPassword)
+            })
+            .then((res) => {
+              if (res.data.success === true) {
+                this.$notify({
+                  title: '删除成功',
+                  message: '',
+                  type: 'success'
+                })
+              } else {
+                this.$notify({
+                  title: '操作失败',
+                  message: '管理员密码错误',
+                  type: 'warning'
+                })
+              }
+              this.onSearch()
+            })
+            .catch((err) => {
+              console.error(err)
+              this.$notify({
+                title: '操作失败',
+                message: '',
+                type: 'warning'
+              })
+            })
           break
       }
       this.dialogVisible = false
@@ -216,7 +287,7 @@ export default {
             }
           })
           .catch((err) => {
-            //  do nothing
+            console.error(err)
           })
       } else {
         manager.searchUser(this.username)
@@ -240,6 +311,7 @@ export default {
             }
           })
           .catch((err) => {
+            console.error(err)
             this.$notify({
               title: 'Not Found',
               message: '未查询到相应结果',
@@ -260,7 +332,7 @@ export default {
     onNew () {
       this.operationType = 3
     },
-    handleCurrentChange (val) {  //  记录当前选中的行
+    handleCurrentChange (val) { // 记录当前选中的行
       this.currentRow = val
       if (this.currentRow !== null) {
         this.operationForm.username = val.username

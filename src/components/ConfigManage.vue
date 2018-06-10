@@ -2,13 +2,28 @@
   <div id="config-management">
     <el-row :gutter="20">
       <el-col :span="8">
-        <ccpanel :optName="'reporterOptions'" :catagory="'basicDetail'"></ccpanel>
-        <ccpanel :optName="'diseaseOptions'" :catagory="'basicDetail'"></ccpanel>
-        <ccpanel :optName="'documentCategoryOptions'" :catagory="'basicDetail'"></ccpanel>
+        <ccpanel
+          :optName="'reporterOptions'"
+          :catagory="'basicDetail'"
+        />
+        <ccpanel
+          :optName="'diseaseOptions'"
+          :catagory="'basicDetail'"
+        />
+        <ccpanel
+          :optName="'documentCategoryOptions'"
+          :catagory="'basicDetail'"
+        />
       </el-col>
       <el-col :span="8">
-        <ccpanel :optName="'countryOptions'" :catagory="'basicDetail'"></ccpanel>
-        <ccpanel :optName="'grSourceOptions'" :catagory="'locationDetail'"></ccpanel>
+        <ccpanel
+          :optName="'countryOptions'"
+          :catagory="'basicDetail'"
+        />
+        <ccpanel
+          :optName="'grSourceOptions'"
+          :catagory="'locationDetail'"
+        />
       </el-col>
       <el-col :span="8">
         <ccpanel :optName="'informationOptions'" :catagory="'diseaseDetail'"></ccpanel>
@@ -18,10 +33,11 @@
 </template>
 
 <script>
-import optionManager from '../model/optionManager.js'
+import optionManager from '@/utils/option-manager'
+import ConfigControlPanel from '@/components/ConfigControlPanel'
 
 export default {
-  data() {
+  data () {
     return {
       operationType: null,
       reporterForm: [],
@@ -32,10 +48,10 @@ export default {
     }
   },
   components: {
-    ccpanel: require('./ConfigControlPanel.vue')
+    ccpanel: ConfigControlPanel
   },
   methods: {
-    handleCurrentChange (val) {  //  记录当前选中的行
+    handleCurrentChange (val) { // 记录当前选中的行
       this.currentRow = val
       if (this.currentRow !== null) {
         this.operationForm.reporter = val.reporter
@@ -61,7 +77,10 @@ export default {
             this.getAllReporter()
             this.operationForm.reporter = null
           })
-          .catch((err) => { this.$notify({ message: '网络错误', type: 'warning' }) })
+          .catch((err) => {
+            console.error(err)
+            this.$notify({ message: '网络错误', type: 'warning' })
+          })
       } else if (this.operationType === 'add') {
         if (this.operationForm.newReporter === null || this.operationForm.newReporter === '') {
           this.$notify({ message: '请在输入要添加的reporter', type: 'warning' })
@@ -74,7 +93,10 @@ export default {
             })
             this.getAllReporter()
           })
-          .catch((err) => { this.$notify({ message: '网络错误', type: 'warning' }) })
+          .catch((err) => {
+            console.error(err)
+            this.$notify({ message: '网络错误', type: 'warning' })
+          })
       }
     },
     getAllReporter () {

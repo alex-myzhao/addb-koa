@@ -8,8 +8,17 @@
     <el-row :gutter="10">
       <el-col :span="8">
         <el-form-item label="Reporter">
-          <el-select v-model="form.Reporter" placeholder="Reporter" v-if="!uneditable">
-            <el-option v-for="item in reporterOptions" :key="item" :label="item" :value="item"></el-option>
+          <el-select
+            v-model="form.Reporter"
+            placeholder="Reporter"
+            v-if="!uneditable"
+          >
+            <el-option
+              v-for="item in reporterOptions"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
           </el-select>
           <el-input v-model="form.Reporter" :readonly="uneditable" v-else></el-input>
         </el-form-item>
@@ -17,7 +26,12 @@
       <el-col :span="8">
         <el-form-item label="Disease">
           <el-select v-model="form.Disease" placeholder="Disease" v-if="!uneditable">
-            <el-option v-for="item in diseaseOptions" :label="item" :value="item"></el-option>
+            <el-option
+              v-for="item in diseaseOptions"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
           </el-select>
           <el-input v-model="form.Disease" :readonly="uneditable" v-else></el-input>
         </el-form-item>
@@ -27,7 +41,12 @@
       <el-col :span="8">
         <el-form-item label="Country">
           <el-select v-model="form.Country" placeholder="Country" v-if="!uneditable">
-            <el-option v-for="item in countryOptions" v-bind:label="item" v-bind:value="item"></el-option>
+            <el-option
+              v-for="item in countryOptions"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
           </el-select>
           <el-input v-model="form.Country" :readonly="uneditable" v-else></el-input>
         </el-form-item>
@@ -35,7 +54,12 @@
       <el-col :span="8">
         <el-form-item label="Document Category">
           <el-select v-model="form.DocumentCategory" placeholder="DocumentCategory" v-if="!uneditable">
-            <el-option v-for="item in documentCategoryOptions" :label="item" :value="item"></el-option>
+            <el-option
+              v-for="item in documentCategoryOptions"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
           </el-select>
           <el-input v-model="form.DocumentCategory" :readonly="uneditable" v-else></el-input>
         </el-form-item>
@@ -161,37 +185,20 @@
 </template>
 
 <script>
-import detailData from '../static/detailData.js'
-import optionManager from '../model/optionManager.js'
-import api from '../model/api.js'
-import util from '../lib/util.js'
-import checker from '../lib/format-checker.js'
+// import detailData from '../static/detailData.js'
+// import optionManager from '../model/optionManager.js'
+import api from '@/utils/api.js'
+import util from '@/utils/util.js'
+import checker from '@/utils/format-checker.js'
+import ClientConfig from '@/client-config'
 
 export default {
   name: 'app',
   props: ['tree', 'idPath', 'nodeID', 'buff'],
-  data() {
+  data () {
     return {
-      uploadUrl: '//' + this.$store.state.config.baseURL + '/importtable',
-      form: {
-        ReportID: -1,  //  自动生成的随机值，从数据库获取
-        Reporter: '',
-        Disease: '',
-        Country: '',
-        DocumentCategory: '',
-        Journal: '',
-        Title: '',
-        Authors: '',
-        YearOfPub: '',
-        Volume: null,
-        Issue: null,
-        PageFrom: null,
-        PageTo: null,
-        AuthorContactNeeded: '',
-        OpenAccess: '',
-        Checked: '',
-        Note1: ''  //  note1
-      },
+      uploadUrl: '//' + ClientConfig.BASE_URL + '/importtable',
+      form: null,
       reporterOptions: [],
       diseaseOptions: [],
       countryOptions: [],
@@ -254,11 +261,11 @@ export default {
       api.checkModified(() => {
         api.getId('Survey Description')
           .then((res) => {
-            var nextId = res.data.id
             var cur = this.tree.currentNode
             util.appendNode.call(this, cur, res.data.id, 'SurveyID')
           })
           .catch((err) => {
+            console.error(err)
             this.$notify({
               title: '',
               message: '网络错误',
@@ -303,7 +310,7 @@ export default {
           util.appendNode.call(this, parent, res.data.id, 'ReportID')
         })
         .catch((err) => {
-          // console.log(err)
+          console.error(err)
           this.$notify({
             title: '',
             message: '网络错误',
@@ -317,10 +324,22 @@ export default {
     },
     initForm () {
       this.form = {
-        ReportID: this.nodeID, Reporter: '', Disease: '', Country: '',
-        DocumentCategory: '', Journal: '', Title: '', Authors: '',
-        YearOfPub: '', Volume: null, Issue: null, PageFrom: null,
-        PageTo: null, AuthorContactNeeded: '', OpenAccess: '', Checked: '',
+        ReportID: this.nodeID,
+        Reporter: '',
+        Disease: '',
+        Country: '',
+        DocumentCategory: '',
+        Journal: '',
+        Title: '',
+        Authors: '',
+        YearOfPub: '',
+        Volume: null,
+        Issue: null,
+        PageFrom: null,
+        PageTo: null,
+        AuthorContactNeeded: '',
+        OpenAccess: '',
+        Checked: '',
         Note1: ''
       }
     },
@@ -334,7 +353,7 @@ export default {
         this.loading = true
         api.getIdContent(this.nodeID, 'Basic Sources')
           .then((res) => {
-            if (res.data.data == null) {
+            if (res.data.data === null) {
               this.initForm()
             } else {
               this.form = res.data.data
@@ -342,6 +361,7 @@ export default {
             this.loading = false
           })
           .catch((err) => {
+            console.error(err)
             this.initForm()
             this.loading = false
           })
@@ -374,7 +394,7 @@ export default {
 
 <style>
 body {
-  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
 }
 
 #basic-import-group {

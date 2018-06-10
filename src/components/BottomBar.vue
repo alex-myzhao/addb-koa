@@ -5,15 +5,15 @@
 </template>
 
 <script>
-export default {
-  data() {
-    return {
+import ClientConfig from '@/client-config'
 
-    }
+export default {
+  data () {
+    return {}
   },
   computed: {
     version () {
-      return this.$store.state.version
+      return ClientConfig.VERSION
     }
   }
 }
