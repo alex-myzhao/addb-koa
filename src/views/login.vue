@@ -30,15 +30,12 @@
       </el-form-item>
       <el-form-item>
         <el-button
-          type="primary"
-          @click="onClick('Login')"
+          v-for="item in ['Login', 'Register']"
+          :key="item"
+          :type="item === 'Login' ? 'primary' : ''"
+          @click="onClick(item)"
         >
-          Login
-        </el-button>
-        <el-button
-          @click="onClick('Register')"
-        >
-          Register
+          {{ item }}
         </el-button>
       </el-form-item>
     </el-form>
@@ -59,7 +56,6 @@
         prop="registerUsername"
       >
         <el-input
-          class="register-input"
           v-model="registerForm.registerUsername"
         />
       </el-form-item>
@@ -69,7 +65,6 @@
       >
         <el-input
           type="password"
-          class="register-input"
           v-model="registerForm.registerPassword"
         />
       </el-form-item>
@@ -79,7 +74,6 @@
       >
         <el-input
           type="password"
-          class="register-input"
           v-model="registerForm.registerConfirm"
         />
       </el-form-item>
@@ -89,15 +83,12 @@
       class="dialog-footer"
     >
       <el-button
-        type="primary"
-        @click="addUser('registerForm')"
+        v-for="item in ['Submit', 'Cancel']"
+        :key="item"
+        :type="item === 'Submit' ? 'primary' : ''"
+        @click="onClick(item)"
       >
-        Submit
-      </el-button>
-      <el-button
-        @click="registerDialogVisible=false"
-      >
-        Cancel
+        {{ item }}
       </el-button>
     </span>
   </el-dialog>
@@ -110,9 +101,8 @@
 </template>
 
 <script>
-import api from '@/utils/api'
 import mailSender from '@/utils/mail-sender'
-
+import api from '@/utils/api'
 import ClientConfig from '@/client-config'
 
 export default {
@@ -180,7 +170,7 @@ export default {
           this.registerDialogVisible = true
         },
         'Submit': () => {
-
+          this.submitForm('registerForm', this.register)
         },
         'Cancel': () => {
           this.registerDialogVisible = false
@@ -219,83 +209,32 @@ export default {
         })
       }
     },
-    // login (formName) {
-    //   this.$refs[formName].validate((valid) => {
-    //     if (valid) {
-    //       api.login(this.loginForm.loginUsername, this.loginForm.loginPassword)
-    //         .then((res) => {
-    //           if (res.data.success) {
-    //             this.$store.commit('updateIslogin', true)
-    //             this.$store.commit('updateUserInfo', {
-    //               authority: res.data.authority,
-    //               id: res.data.id,
-    //               username: res.data.username
-    //             })
-    //             this.$router.push('/home')
-    //           } else {
-    //             this.$notify({
-    //               title: 'Login Failed',
-    //               message: 'Wrong username or password',
-    //               type: 'warning'
-    //             })
-    //           }
-    //         })
-    //         .catch((err) => {
-    //           console.error(err)
-    //           this.$notify({
-    //             title: 'Login Failed',
-    //             type: 'warning'
-    //           })
-    //         })
-    //     } else {
-    //       return false
-    //     }
-    //   })
-    // },
-    addUser (formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          this.registerDialogVisible = false
-          api.register(this.register.username, this.register.password, 4)
-            .then((res) => {
-              if (res.data.success) {
-                this.$notify({
-                  title: '',
-                  message: 'Register Successfully',
-                  type: 'success'
-                })
-                return Promise.resolve()
-              } else {
-                this.$notify({
-                  title: 'Register Failed',
-                  message: 'Username already exists',
-                  type: 'warning'
-                })
-                return Promise.reject(new Error('Username already exists'))
-              }
-            })
-            .then(res => {
-              mailSender.newUserReport(this.register.username)
-                .then(res => {
-                  // send a email
-                })
-                .catch(err => {
-                  console.error(err)
-                })
-            })
-            .catch((err) => {
-              console.error(err)
-              this.$notify({
-                title: 'Register Failed',
-                message: '',
-                type: 'warning'
-              })
-            })
+    async register () {
+      this.registerDialogVisible = false
+      try {
+        let res = await api.register(this.registerForm.registerUsername, this.registerForm.registerPassword, 4)
+        if (res.data.success) {
+          this.$notify({
+            title: 'Register Successfully',
+            message: `the user ${this.registerForm.registerUsername} has been registered`,
+            type: 'success'
+          })
         } else {
-          // console.log('error submit!!');
-          return false
+          throw new Error('username already exists')
         }
-      })
+      } catch (err) {
+        this.$notify({
+          title: 'Register Failed',
+          message: err ? err.message : 'connection lost',
+          type: 'warning'
+        })
+      }
+      // send mail
+      try {
+        await mailSender.newUserReport(this.register.username)
+      } catch (err) {
+        console.error(err)
+      }
     }
   }
 }
