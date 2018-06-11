@@ -1,121 +1,110 @@
 <template>
 <div id="login">
-  <h1 id="login-title">Welcome to Disease DB</h1>
-  <el-form
-    :model="loginForm"
-    :rules="loginRules"
-    ref="loginForm"
-    label-width="0px"
-  >
-    <div id="username-input">
-      <el-form-item label="" prop="usernameInput">
+  <div class="login-area-container addb-shadow-box">
+    <h1 class="login-title">Welcome to Disease DB</h1>
+    <el-form
+      :model="loginForm"
+      :rules="loginRules"
+      ref="loginForm"
+    >
+      <el-form-item
+        class="input-form-items"
+        prop="loginUsername"
+      >
         <el-input
-          v-model="loginForm.usernameInput"
+          v-model="loginForm.loginUsername"
           @keyup.enter.native="login('loginForm')"
-          size="large"
           placeholder="Username"
         />
       </el-form-item>
-    </div>
-    <div id="password-input">
-      <el-form-item label="" prop="passwordInput">
+      <el-form-item
+        class="input-form-items"
+        prop="loginPassword"
+      >
         <el-input
-          id="login-password-input"
+          v-model="loginForm.loginPassword"
           type="password"
-          v-model="loginForm.passwordInput"
-          @keyup.enter.native="login('loginForm')"
-          size="large"
           placeholder="Password"
+          @keyup.enter.native="onClick('Login')"
         />
       </el-form-item>
-    </div>
-    <el-form-item>
-      <div id="login-button">
+      <el-form-item>
         <el-button
-          id="login-login-btn"
           type="primary"
-          @click="login('loginForm')"
+          @click="onClick('Login')"
         >
-          Sign in
+          Login
         </el-button>
         <el-button
-          id="login-register-btn"
-          @click="onRegister"
+          @click="onClick('Register')"
         >
-          Sign up
+          Register
         </el-button>
-      </div>
-    </el-form-item>
-  </el-form>
+      </el-form-item>
+    </el-form>
+   </div>
 
   <el-dialog
     title="Sign Up"
-    :visible.sync="dialogVisible"
+    :visible.sync="registerDialogVisible"
   >
-    <div id="login-dialog">
-      <el-form
-        :model="register"
-        :rules="registerRules"
-        ref="register"
-        label-width="100px"
+    <el-form
+      :model="registerForm"
+      :rules="registerRules"
+      ref="registerForm"
+      label-width="100px"
+    >
+      <el-form-item
+        label="Username"
+        prop="registerUsername"
       >
-        <el-form-item
-          label="Username"
-          prop="username"
-        >
-          <el-input
-            class="register-input"
-            v-model="register.username"
-          />
-        </el-form-item>
-        <el-form-item
-          label="Password"
-          prop="password">
-          <el-input
-            type="password"
-            class="register-input"
-            v-model="register.password"
-          />
-        </el-form-item>
-        <el-form-item
-          label="Comfirm"
-          prop="confirm">
-          <el-input
-            type="password"
-            class="register-input"
-            v-model="register.confirm"
-          />
-        </el-form-item>
-      </el-form>
-    </div>
+        <el-input
+          class="register-input"
+          v-model="registerForm.registerUsername"
+        />
+      </el-form-item>
+      <el-form-item
+        label="Password"
+        prop="registerPassword"
+      >
+        <el-input
+          type="password"
+          class="register-input"
+          v-model="registerForm.registerPassword"
+        />
+      </el-form-item>
+      <el-form-item
+        label="Comfirm"
+        prop="registerConfirm"
+      >
+        <el-input
+          type="password"
+          class="register-input"
+          v-model="registerForm.registerConfirm"
+        />
+      </el-form-item>
+    </el-form>
     <span
       slot="footer"
-      class="dialog-footer">
+      class="dialog-footer"
+    >
       <el-button
         type="primary"
-        @click="addUser('register')"
+        @click="addUser('registerForm')"
       >
-        Sign up
+        Submit
       </el-button>
       <el-button
-        @click="dialogVisible=false"
+        @click="registerDialogVisible=false"
       >
         Cancel
       </el-button>
     </span>
   </el-dialog>
 
-  <div id="login-info-container">
-    <el-row>
-      <span>
-        {{ appName }}
-      </span>
-    </el-row>
-    <el-row>
-      <span>
-        Version {{ version }}
-      </span>
-    </el-row>
+  <div id="login-app-info">
+    <div>{{ appName }}</div>
+    <div>Version {{ version }}</div>
   </div>
 </div>
 </template>
@@ -129,57 +118,46 @@ import ClientConfig from '@/client-config'
 export default {
   name: 'login',
   data () {
-    var validatePass1 = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('Please input your password'))
-      } else {
-        if (this.register.confirm !== '') {
-          this.$refs.register.validateField('confirm')
-        }
-        callback()
-      }
-    }
-    var validatePass2 = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('Please confirm your password'))
-      } else if (value !== this.register.password) {
+    let validateConfirmPassword = (rule, value, callback) => {
+      if (value !== this.registerForm.registerPassword) {
         callback(new Error('Please confirm your password'))
       } else {
         callback()
       }
     }
     return {
-      dialogVisible: false,
       //  login
       loginForm: {
-        usernameInput: '',
-        passwordInput: ''
+        loginUsername: '',
+        loginPassword: ''
       },
       loginRules: {
-        usernameInput: [
+        loginUsername: [
           { required: true, message: 'Please input your username', trigger: 'blur' }
         ],
-        passwordInput: [
+        loginPassword: [
           { required: true, message: 'Please input your password', trigger: 'blur' }
         ]
       },
       //  register
-      register: {
-        userame: '',
-        password: '',
-        confirm: ''
+      registerDialogVisible: false,
+      registerForm: {
+        registerUsername: '',
+        registerPassword: '',
+        registerConfirm: ''
       },
       registerRules: {
-        username: [
+        registerUsername: [
           { required: true, message: 'Please input your username', trigger: 'blur' },
           { min: 8, max: 20, message: 'Username should be longer than 8 and shorter than 20 characters', trigger: 'blur' }
         ],
-        password: [
-          { validator: validatePass1, trigger: 'blur' },
+        registerPassword: [
+          { required: true, message: 'Please input your password', trigger: 'blur' },
           { min: 8, max: 20, message: 'Password should be longer than 8 and shorter than 20 characters', trigger: 'blur' }
         ],
-        confirm: [
-          { validator: validatePass2, trigger: 'blur' }
+        registerConfirm: [
+          { required: true, message: 'Please confirm your password', trigger: 'blur' },
+          { validator: validateConfirmPassword, trigger: 'blur' }
         ]
       }
     }
@@ -193,48 +171,91 @@ export default {
     }
   },
   methods: {
-    login (formName) {
+    onClick (buttonName) {
+      const switchObj = {
+        'Login': () => {
+          this.submitForm('loginForm', this.login)
+        },
+        'Register': () => {
+          this.registerDialogVisible = true
+        },
+        'Submit': () => {
+
+        },
+        'Cancel': () => {
+          this.registerDialogVisible = false
+        }
+      }
+      if (switchObj[buttonName]) {
+        switchObj[buttonName]()
+      }
+    },
+    submitForm (formName, callback) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          api.login(this.loginForm.usernameInput, this.loginForm.passwordInput)
-            .then((res) => {
-              if (res.data.success) {
-                // console.log(res.data)
-                this.$store.commit('updateIslogin', true)
-                this.$store.commit('updateUserInfo', {
-                  authority: res.data.authority,
-                  id: res.data.id,
-                  username: res.data.username
-                })
-                this.$router.push('/home')
-              } else {
-                this.$notify({
-                  title: 'Login Failed',
-                  message: 'Wrong username or password',
-                  type: 'warning'
-                })
-              }
-            })
-            .catch((err) => {
-              console.error(err)
-              this.$notify({
-                title: '',
-                message: 'Login Failed',
-                type: 'Disconnected'
-              })
-            })
-        } else {
-          return false
+          callback()
         }
       })
     },
-    onRegister () {
-      this.dialogVisible = true
+    async login () {
+      try {
+        let res = await api.login(this.loginForm.loginUsername, this.loginForm.loginPassword)
+        if (res.data.success) {
+          this.$store.commit('updateIslogin', true)
+          this.$store.commit('updateUserInfo', {
+            authority: res.data.authority,
+            id: res.data.id,
+            username: res.data.username
+          })
+          this.$router.push('/home')
+        } else {
+          throw new Error('wrong username or password')
+        }
+      } catch (err) {
+        this.$notify({
+          title: 'Login Failed',
+          message: err.message,
+          type: 'warning'
+        })
+      }
     },
+    // login (formName) {
+    //   this.$refs[formName].validate((valid) => {
+    //     if (valid) {
+    //       api.login(this.loginForm.loginUsername, this.loginForm.loginPassword)
+    //         .then((res) => {
+    //           if (res.data.success) {
+    //             this.$store.commit('updateIslogin', true)
+    //             this.$store.commit('updateUserInfo', {
+    //               authority: res.data.authority,
+    //               id: res.data.id,
+    //               username: res.data.username
+    //             })
+    //             this.$router.push('/home')
+    //           } else {
+    //             this.$notify({
+    //               title: 'Login Failed',
+    //               message: 'Wrong username or password',
+    //               type: 'warning'
+    //             })
+    //           }
+    //         })
+    //         .catch((err) => {
+    //           console.error(err)
+    //           this.$notify({
+    //             title: 'Login Failed',
+    //             type: 'warning'
+    //           })
+    //         })
+    //     } else {
+    //       return false
+    //     }
+    //   })
+    // },
     addUser (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogVisible = false
+          this.registerDialogVisible = false
           api.register(this.register.username, this.register.password, 4)
             .then((res) => {
               if (res.data.success) {
@@ -280,62 +301,35 @@ export default {
 }
 </script>
 
-<style>
-#login-title {
-  font-size: 40px;
-  margin-top: 15%;
-  color: #FFFFFF;
-  font-family: 'Hiragino Sans GB';
-}
-
-#login-login-btn {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-style: none;
-  width: 10%;
-}
-
-#login-login-btn:hover {
-  background-color: rgba(184, 78, 52, 0.7);
-}
-
-#login-register-btn {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-style: none;
-  color: #FFFFFF;
-  width: 10%;
-}
-
-#login-register-btn:hover {
-  background-color: rgba(184, 78, 52, 0.7);
-}
-
+<style scoped>
 #login {
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  background-image: url('../assets/background1.jpg');
-  background-size: cover;
+  background-color: #FFFFFF;
+  /* background-image: url('../assets/background1.jpg');
+  background-size: cover; */
 }
 
-#username-input {
-  width: 35%;
+.login-area-container {
+  margin-top: calc(50vh - 200px);
   margin-left: auto;
   margin-right: auto;
-  /*margin-bottom: 20px;*/
-  font-family:'Helvetica Neue';
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  width: 70%;
+  transition: .2s;
 }
 
-#password-input {
-  width: 35%;
-  margin-left: auto;
-  margin-right: auto;
-  font-family:'Helvetica Neue';
+.login-title {
+  font-size: 2.5rem;
+  color: #442D2B;
 }
 
-#login-button {
-  width: 55%;
+.input-form-items {
+  width: 65%;
   margin-left: auto;
   margin-right: auto;
 }
@@ -347,11 +341,10 @@ export default {
   right: 20px;
 }
 
-#login-info-container {
+#login-app-info {
   text-align: left;
-  font-family: 'Helvetica Neue';
   position: absolute;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(0, 0, 0, 0.5);
   left: 20px;
   bottom: 20px;
 }

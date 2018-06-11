@@ -1,15 +1,18 @@
 import Vue from 'vue'
+import axios from 'axios'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-import axios from 'axios'
+import locale from 'element-ui/lib/locale/lang/en'
 
 import App from './App.vue'
 import router from './router/index'
 import store from './store/index.js'
-
 import ClientConfig from './client-config'
 
-Vue.use(ElementUI)
+// self-defined styles
+import '@/styles/style.css'
+
+Vue.use(ElementUI, { locale })
 
 Vue.config.productionTip = false
 

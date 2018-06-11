@@ -36,7 +36,7 @@
 import mailSender from '@/utils/mail-sender'
 
 export default {
-  name: 'topbar',
+  name: 'TopBar',
   data () {
     return {
       bugReportShow: false,
