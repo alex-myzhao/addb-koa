@@ -1,6 +1,6 @@
 <template>
 <div id="update-log">
-  <div id="update-log-version-hint">Current Version: {{ this.$store.state.config.version }}</div>
+  <div id="update-log-version-hint">Current Version: {{ version }}</div>
   <div>
     <el-table :data="tableData" style="width: 100%" align="center" :show-header="showHead">
       <el-table-column prop="date" label="更新日期" width="180"></el-table-column>
@@ -11,6 +11,8 @@
 </template>
 
 <script>
+import ClientConfig from '@/client-config'
+
 export default {
   data () {
     return {
@@ -94,6 +96,11 @@ export default {
         content: '..............'
       }],
       showHead: false
+    }
+  },
+  computed: {
+    version () {
+      return ClientConfig.VERSION
     }
   }
 }

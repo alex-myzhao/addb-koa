@@ -1,6 +1,6 @@
 <template>
 <div id="home">
-  <TopBar id="top-menu"/>
+  <!-- <TopBar id="top-menu"/> -->
   <div id="page-container">
     <!-- <h1>{{ helloMsg }}</h1> -->
     <el-input

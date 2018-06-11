@@ -4,7 +4,7 @@
   v-loading.fullscreen.lock="treeLoading"
   element-loading-text="Loading"
 >
-  <TopBar id="top-menu"/>
+  <!-- <TopBar id="top-menu"/> -->
   <div id="detail-page-container">
     <el-row>
       <el-col

@@ -1,6 +1,6 @@
 <template>
 <div id="manage">
-  <TopBar id="top-menu" />
+  <!-- <TopBar id="top-menu" /> -->
   <div id="manage-page-container">
     <el-tabs
       class="manage-tabs"

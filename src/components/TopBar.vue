@@ -1,34 +1,46 @@
 <template>
   <div id="topbar">
     <el-dialog
-      id="bug-report"
       title="Bug Report"
-      v-model="bugReportShow"
-      :modal="false"
-      :close-on-click-modal="false"
+      :visible.sync="bugReportDialogVisible"
     >
       <div class="bug-report-hint">
-        <div class="bug-desc">请您具体描述您所遇到的Bug，或对本系统的任何建议😅：</div>
-        <div>出现在**哪个页面**，由于**何种操作导致**以及，最好能提供**导致出现bug的数据**</div>
+        Suggestions or bug descriptions:
       </div>
-      <el-input type="textarea" v-model="description" :rows="5"></el-input>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="bugReportShow = false">取 消</el-button>
-        <el-button type="primary" @click="onSendMail">确 定</el-button>
+      <el-input
+        type="textarea"
+        v-model="description"
+        :rows="5"
+      />
+      <span slot="footer">
+        <el-button
+          type="primary"
+          @click="onClick('Submit')"
+        >
+          Submit
+        </el-button>
+        <el-button
+          @click="onClick('Cancel')"
+        >
+          Cancel
+        </el-button>
       </span>
     </el-dialog>
 
-    <el-menu
-      class="el-menu-demo"
-      mode="horizontal"
-      @select="handleSelect"
-    >
-      <el-menu-item id="topbar-welcome" index="5">{{ msg }}</el-menu-item>
-      <el-menu-item index="1"><i class="el-icon-menu"></i>Home</el-menu-item>
-      <el-menu-item v-show="canManage" index="2"><i class="el-icon-setting"></i>Management</el-menu-item>
-      <el-menu-item index="3"><i class="el-icon-message"></i>Bug Report</el-menu-item>
-      <el-menu-item index="4"><i class="el-icon-close"></i>Log Out</el-menu-item>
-    </el-menu>
+    <div class="menu-container addb-shadow-box">
+      <div id="topbar-welcome">{{ msg }}</div>
+      <el-menu
+        class="topbar-menu"
+        mode="horizontal"
+        default-active="1"
+        @select="handleSelect"
+      >
+        <el-menu-item index="1"><i class="el-icon-menu"/>Home</el-menu-item>
+        <el-menu-item v-show="canManage" index="2"><i class="el-icon-setting"/>Management</el-menu-item>
+        <el-menu-item index="3"><i class="el-icon-message"/>Bug Report</el-menu-item>
+        <el-menu-item index="4"><i class="el-icon-close"/>Log Out</el-menu-item>
+      </el-menu>
+    </div>
   </div>
 </template>
 
@@ -39,7 +51,7 @@ export default {
   name: 'TopBar',
   data () {
     return {
-      bugReportShow: false,
+      bugReportDialogVisible: false,
       description: null
     }
   },
@@ -48,38 +60,46 @@ export default {
       return this.$store.state.userInfo.authority === 1
     },
     msg () {
-      return 'Welcome, ' + this.$store.state.userInfo.username
+      return `Welcome, ${this.$store.state.userInfo.username}`
     }
   },
   methods: {
-    onSendMail () {
-      this.bugReportShow = false
-      if (this.description === null || this.description.length < 10) {
+    onClick (buttonName) {
+      const switchObj = {
+        // send a bug report mail
+        'Submit': () => {
+          this.sendMail()
+        },
+        'Cancel': () => {
+          this.bugReportDialogVisible = false
+        }
+      }
+      if (switchObj[buttonName]) {
+        switchObj[buttonName]()
+      }
+    },
+    async sendMail () {
+      try {
+        if (!this.description || this.description.length < 10) {
+          throw new Error('your descriptions are too short')
+        }
+        let res = await mailSender.bugReport(this.description)
+        if (res.data.success) {
+          this.$notify({
+            title: 'Report Successfully',
+            message: 'thank you for your feedback',
+            type: 'success'
+          })
+        } else {
+          throw new Error('connection lost')
+        }
+      } catch (err) {
         this.$notify({
-          message: '您的描述过于简短，为确保反馈质量请您填写更多信息',
+          title: 'Report Failed',
+          message: err.message,
           type: 'warning'
         })
-        return
       }
-      mailSender.bugReport(this.description)
-        .then((res) => {
-          console.log()
-          if (res.data.success) {
-            this.$notify({
-              message: '感谢您的反馈～',
-              type: 'success'
-            })
-          } else {
-            this.$notify({ message: '网络错误', type: 'warning' })
-          }
-        })
-        .catch((err) => {
-          console.error(err)
-          this.$notify({
-            message: '网络错误',
-            type: 'warning'
-          })
-        })
     },
     handleSelect (key, keyPath) {
       if (key === '1') {
@@ -88,7 +108,7 @@ export default {
         this.$router.push('/manage')
       } else if (key === '3') {
         //  bug report
-        this.bugReportShow = true
+        this.bugReportDialogVisible = true
       } else if (key === '4') {
         this.$store.commit('updateHomeConditionsBuff', {
           searchID: null, dValue: '', cValue: '', yValue: '', doubleClick: ''
@@ -101,19 +121,26 @@ export default {
 }
 </script>
 
-<style>
-body {
-  margin: 0;
+<style scoped>
+#topbar {
+  height: 62px;
+  z-index: 100;
+}
+
+.menu-container {
+  padding-left: 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.topbar-menu {
+  border-bottom: none;
 }
 
 h1 {
   text-align: center;
-}
-
-#topbar {
-  height: 5vh;
-  z-index: 100;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .12), 0 0 6px 0 rgba(0, 0, 0, .04);
 }
 
 #topbar-welcome {
@@ -135,9 +162,5 @@ h1 {
   margin-bottom: 10px;
   text-align: left;
   color: #99A9BF;
-}
-
-.bug-desc {
-  color: #000000;
 }
 </style>

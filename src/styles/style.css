@@ -1,3 +1,7 @@
+body {
+  margin: 0;
+}
+
 .addb-shadow-box {
   border: 1px solid #ebebeb;
   border-radius: 3px;
