@@ -1,140 +1,175 @@
 <template>
 <div id="home">
-  <!-- <TopBar id="top-menu"/> -->
-  <div id="page-container">
-    <!-- <h1>{{ helloMsg }}</h1> -->
-    <el-input
-      class="home-short-items"
-      placeholder="Report ID"
-      v-model="conditions.searchID"
-    />
-    <el-select
-      class="home-short-items"
-      v-model="conditions.dValue"
-      placeholder="Disease"
-      clearable
-    >
-      <el-option
-        v-for="item in diseaseOptions"
-        :key="item"
-        :label="item"
-        :value="item"
+  <div id="home-page-container">
+    <div class="search-condition-group">
+      <el-input
+        class="search-condition-items"
+        placeholder="Report ID"
+        v-model="conditions.searchID"
       />
-    </el-select>
-    <el-select
-      class="home-short-items"
-      v-model="conditions.cValue"
-      placeholder="Country"
-      clearable
-    >
-      <el-option
-        v-for="item in countryOptions"
-        :key="item"
-        :label="item"
-        :value="item"
+      <el-select
+        class="search-condition-items"
+        v-model="conditions.dValue"
+        placeholder="Disease"
+        clearable
+      >
+        <el-option
+          v-for="item in diseaseOptions"
+          :key="item"
+          :label="item"
+          :value="item"
+        />
+      </el-select>
+      <el-select
+        class="search-condition-items"
+        v-model="conditions.cValue"
+        placeholder="Country"
+        clearable
+      >
+        <el-option
+          v-for="item in countryOptions"
+          :key="item"
+          :label="item"
+          :value="item"
+        />
+      </el-select>
+      <el-date-picker
+        class="search-condition-items"
+        v-model="conditions.yValue"
+        align="right"
+        type="year"
+        placeholder="Year"
       />
-    </el-select>
-    <el-date-picker
-      id="home-date-select-item"
-      v-model="conditions.yValue"
-      align="right"
-      type="year"
-      placeholder="Year"
-    />
-    <el-select
-      class="home-short-items"
-      v-model="conditions.doubleClick"
-      placeholder="Double Check"
-      clearable>
-      <el-option
-        v-for="item in clickOptions"
-        :key="item"
-        :label="item"
-        :value="item"
-      />
-    </el-select>
-    <el-button-group id="home-button-group">
-      <el-button
-        class="home-button"
-        @click="onSearch"
-        icon="search"
+      <el-select
+        class="search-condition-items"
+        v-model="conditions.doubleClick"
+        placeholder="Double Check"
+        clearable
       >
-        Search
-      </el-button>
+        <el-option
+          v-for="item in clickOptions"
+          :key="item"
+          :label="item"
+          :value="item"
+        />
+      </el-select>
       <el-button
-        class="home-button"
-        @click="onBatchExport"
-        icon="share"
-      >
-        Export
-      </el-button>
-      <el-button
-        class="home-button"
-        @click="onBatchInput"
-        icon="upload2"
-        v-show="canEdit"
-      >
-        Import
-      </el-button>
-      <el-button
-        class="home-button"
-        @click="onView"
-        icon="view"
-      >
-        View
-      </el-button>
-      <el-button
-        class="home-button"
-        @click="onEdit"
-        icon="edit"
-        v-show="canEdit"
-      >
-        Edit
-      </el-button>
-      <el-button
-        class="home-button"
-        @click="onDelete"
-        icon="delete"
-        v-show="canEdit"
-      >
-        Delete
-      </el-button>
-      <el-button
-        class="home-button"
         type="primary"
+        icon="el-icon-search"
+        circle
+        @click="onSearch"
+      />
+      <el-button
+        id="new-button"
+        type="success"
+        icon="el-icon-plus"
+        circle
         @click="onNew"
-        icon="plus"
         v-show="canEdit"
+      />
+      <el-popover
+        placement="left"
+        trigger="click"
       >
-        New
-      </el-button>
-    </el-button-group>
+        <div>
+          <el-button
+            class="addb-default-button"
+            type="success"
+            icon="el-icon-download"
+            @click="onBatchExport"
+          >
+            Export
+          </el-button>
+          <el-button
+            class="addb-default-button"
+            type="info"
+            icon="el-icon-upload2"
+            @click="onBatchInput"
+            v-show="canEdit"
+          >
+            Import
+          </el-button>
+          <el-button
+            class="addb-default-button"
+            type="danger"
+            icon="el-icon-delete"
+            @click="onDelete"
+            v-show="canEdit"
+          >
+            Delete
+          </el-button>
+        </div>
+        <el-button
+          slot="reference"
+          icon="el-icon-menu"
+          circle
+        />
+      </el-popover>
+    </div>
     <div class="home-table-container">
       <el-table
         id="result-table"
-        :data="tableData"
         highlight-current-row
         align="center"
+        tooltip-effect="light"
+        stripe
+        :data="tableData"
+        v-loading="isLoading"
+        element-loading-text="Searching"
+        :default-sort = "{ prop: 'id', order: 'descending' }"
         @current-change="handleCurrentChange"
         @row-dblclick="doubleClickEvent"
         @selection-change="handleSelectionChange"
-        :default-sort = "{ prop: 'id', order: 'descending' }"
-        v-loading="isLoading"
-        element-loading-text="Searching"
       >
-        <el-table-column type="selection" width="55" sortable></el-table-column>
-        <el-table-column property="id" label="id" width="90" sortable></el-table-column>
-        <el-table-column property="title" label="Title" width="200" sortable></el-table-column>
-        <el-table-column property="author" label="Author" width="200" sortable></el-table-column>
-        <el-table-column property="disease" label="Disease" width="200" sortable></el-table-column>
-        <el-table-column property="reporter" label="Reporter" width="140" sortable></el-table-column>
-        <el-table-column property="time" label="Publish Time" sortable></el-table-column>
+        <el-table-column
+          type="selection"
+          min-width="50"
+          fixed
+        />
+        <el-table-column
+          property="id"
+          label="ID"
+          min-width="60"
+          sortable
+        />
+        <el-table-column
+          property="title"
+          label="Title"
+          min-width="200"
+          show-overflow-tooltip
+          sortable
+        />
+        <el-table-column
+          property="author"
+          label="Author"
+          min-width="140"
+          show-overflow-tooltip
+          sortable
+        />
+        <el-table-column
+          property="disease"
+          label="Disease"
+          min-width="200"
+          show-overflow-tooltip
+          sortable
+        />
+        <el-table-column
+          property="reporter"
+          label="Reporter"
+          min-width="140"
+          show-overflow-tooltip
+          sortable
+        />
+        <el-table-column
+          property="time"
+          label="Time"
+          sortable
+        />
       </el-table>
     </div>
   </div>
 
   <el-dialog
-    id="dialog"
     :title="dialogTitle"
     :visible.sync="dialogUploadVisible"
     :close-on-click-modal="false"
@@ -195,7 +230,7 @@ export default {
   data () {
     return {
       //  download url
-      importUrl: '//' + ClientConfig.BASE_URL + '/importexcel',
+      importUrl: `//${ClientConfig.BASE_URL}/importexcel`,
       //  search conditions
       conditions: {
         searchID: null,
@@ -268,6 +303,12 @@ export default {
     }
   },
   methods: {
+    onClick (buttonName) {
+      const switchObj = {}
+      if (switchObj[buttonName]) {
+        switchObj[buttonName]()
+      }
+    },
     isEmpty (ele) {
       return ele === undefined || ele === null || ele === ''
     },
@@ -444,24 +485,21 @@ export default {
 }
 </script>
 
-<style>
-#buttons {
-  margin-top: 10px;
-  margin-bottom: 10px;
+<style scoped>
+#home {
+  overflow: hidden;
 }
 
-#page-container {
-  height: calc(95vh - 60px);
-  margin-top: 2vh;
+#home-page-container {
+  height: calc(95vh - 62px);
+  margin-top: 1vh;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
   padding: 1vh;
   border: 1px solid #d1dbe5;
   border-radius: 4px;
   text-align: left;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .12), 0 0 6px 0 rgba(0, 0, 0, .04);
-}
-
-#dialog {
-  user-select: none;
 }
 
 #result-table {
@@ -475,10 +513,6 @@ export default {
   margin-right: auto;
 }
 
-#home-button-group {
-  margin: 2vh 0;
-}
-
 .btn-container {
   text-align: right;
 }
@@ -487,20 +521,23 @@ export default {
   margin-top: 15px;
 }
 
-.home-short-items {
-  width: 19vw;
+.search-condition-items {
+  width: 16vw;
 }
 
-.home-button {
-  width: 14vw;
+#new-button {
+  margin-left: 0;
 }
 
 .home-table-container {
-  height: calc(93vh - 140px);
+  margin-top: 0.5rem;
+  height: calc(93vh - 100px);
   overflow: scroll;
 }
-
-#home-date-select-item {
-  width: 19vw;
+.search-condition-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
 }
 </style>

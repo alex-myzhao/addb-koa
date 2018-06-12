@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <top-bar/>
+    <top-bar v-if="isLogin"/>
     <router-view/>
   </div>
 </template>
@@ -12,6 +12,11 @@ export default {
   name: 'App',
   components: {
     TopBar
+  },
+  computed: {
+    isLogin () {
+      return this.$store.state.islogin
+    }
   }
 }
 </script>

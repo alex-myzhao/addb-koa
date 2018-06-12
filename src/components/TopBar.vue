@@ -27,7 +27,9 @@
       </span>
     </el-dialog>
 
-    <div class="menu-container addb-shadow-box">
+    <div
+      class="menu-container addb-shadow-box"
+    >
       <div id="topbar-welcome">{{ msg }}</div>
       <el-menu
         class="topbar-menu"
@@ -139,13 +141,9 @@ export default {
   border-bottom: none;
 }
 
-h1 {
-  text-align: center;
-}
-
 #topbar-welcome {
   font-weight: bold;
-  font-size: 18px;
+  font-size: 1.5rem;
   border: none;
 }
 
