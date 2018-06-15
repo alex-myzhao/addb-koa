@@ -102,9 +102,32 @@ export default {
       type: type
     })
   },
-  query: function (id, condition, authority, context) {
+  query4Result: async function (id, condition, authority) {
     const url = '/query'
-    axios.post(url, {
+    let res = await axios.post(url, {
+      id: id,
+      condition: condition,
+      authority: authority
+    })
+    if (res.data.result) {
+      let resDataArr = []
+      for (let item in res.data.result) {
+        resDataArr.push({
+          id: res.data.result[item].ReportID,
+          title: res.data.result[item].Title,
+          author: res.data.result[item].Authors,
+          disease: res.data.result[item].Disease,
+          reporter: res.data.result[item].Reporter,
+          time: res.data.result[item].YearOfPub
+        })
+      }
+      return resDataArr
+    } else {
+      throw new Error('No Result Found')
+    }
+  },
+  query: function (id, condition, authority, context) {
+    axios.post('/query', {
       id: id,
       condition: condition,
       authority: authority

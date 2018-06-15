@@ -101,6 +101,7 @@
         </div>
         <el-button
           slot="reference"
+          type="info"
           icon="el-icon-menu"
           circle
         />
@@ -170,49 +171,51 @@
   </div>
 
   <el-dialog
-    :title="dialogTitle"
-    :visible.sync="dialogUploadVisible"
+    :title="uploadDialogTitle"
+    :visible.sync="uploadDialogVisible"
     :close-on-click-modal="false"
-    @close="onCloseDialog">
+    @close="onCloseDialog"
+  >
     <el-upload
+      name="report"
       v-show="canUpload"
       class="upload-demo" drag
       :action="importUrl"
-      name="report"
-      :show-file-list="showlist"
+      :show-file-list="false"
       :on-success="onUploadSuccess"
       :data="payload"
       mutiple
     >
       <i class="el-icon-upload"></i>
-      <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+      <div class="el-upload__text">Drag your file here; or <em>Click Here</em> to upload</div>
       <div class="el-upload__tip" slot="tip">{{ uploadHint }}</div>
     </el-upload>
     <div v-show="!canUpload">{{ uploadHint }}</div>
     <div id="upload-steps">
       <el-steps
-        :space="110"
         :active="active"
         finish-status="success"
-        :center="center"
+        align-center
       >
         <el-step
           v-for="i in 5"
           :key="i"
-          :title="'Step ' + i"
+          :title="`Step ${i}`"
         />
       </el-steps>
     </div>
-    <div>
+    <span slot="footer">
       <el-button
-        id="download-demo"
         @click="downloadDemo"
-        icon="arrow-down"
-        type="primary"
+        icon="el-icon-download"
+        type="info"
       >
         Get Demo
       </el-button>
-    </div>
+      <el-button>
+        Cancel
+      </el-button>
+    </span>
   </el-dialog>
   <!--  用于为用户提供下载文档功能  -->
   <a id="getexcel" href=""></a>
@@ -249,12 +252,9 @@ export default {
       isLoading: false,
       resultMultipleSelection: [],
       // dialog
-      dialogUploadVisible: false,
-      // upload
-      showlist: false,
+      uploadDialogVisible: false,
       // steps
       active: 0,
-      center: true,
       hints: [ 'Basic Sources', 'Survey', 'Location', 'Disease', 'Intervention' ]
     }
   },
@@ -262,8 +262,8 @@ export default {
     TopBar
   },
   computed: {
-    helloMsg: function () {
-      return 'Hello, ' + this.$store.state.userInfo.username
+    helloMsg () {
+      return `Hello, ${this.$store.state.userInfo.username}`
     },
     opt: {
       get () { return this.$store.state.opt },
@@ -277,28 +277,28 @@ export default {
       get () { return this.$store.state.viewID },
       set (v) { this.$store.commit('updateViewID', v) }
     },
-    dialogTitle: function () {
+    uploadDialogTitle () {
       if (this.active >= 5) {
         return 'Done~'
       }
-      return 'Please Upload ' + this.hints[this.active]
+      return `Please Upload ${this.hints[this.active]}`
     },
-    uploadHint: function () {
+    uploadHint () {
       if (this.active >= 5) {
         return 'You can close this dialog now'
       }
       return this.hints[this.active] + ' file needed, .xls/.xlsx support only'
     },
-    canUpload: function () {
+    canUpload () {
       return this.active < 5
     },
-    payload: function () {
+    payload () {
       return {
         id: this.active,
         username: this.$store.state.userInfo.username
       }
     },
-    canEdit: function () {
+    canEdit () {
       return this.$store.state.userInfo.authority <= 3
     }
   },
@@ -320,7 +320,7 @@ export default {
     onUploadSuccess (response, file, fileList) {
       // console.log(response)
       if (!response.success) {
-        this.dialogUploadVisible = false
+        this.uploadDialogVisible = false
         this.$alert('上传失败', '解析Excel时发生错误', {
           confirmButtonText: '确定',
           callback: action => {}
@@ -346,7 +346,7 @@ export default {
     },
     onBatchInput () {
       this.active = 0
-      this.dialogUploadVisible = true
+      this.uploadDialogVisible = true
     },
     onBatchExport () {
       var ids = []
@@ -449,6 +449,29 @@ export default {
         doubleClick: this.conditions.doubleClick === '' ? null : (this.conditions.doubleClick === 'Yes' ? 'Yes' : 'No')
       }, this.$store.state.userInfo.authority, that)
     },
+    async search () {
+      this.isLoading = true
+      try {
+        let yearArr = String(this.conditions.yValue).split(' ')
+        let resDataArr = await api.query4Result(this.conditions.searchID, {
+          disease: this.conditions.dValue === '' ? null : this.conditions.dValue,
+          country: this.conditions.cValue === '' ? null : this.conditions.cValue,
+          year: this.conditions.yValue === '' ? null : parseInt(yearArr[3]),
+          doubleClick: this.conditions.doubleClick === '' ? null : (this.conditions.doubleClick === 'Yes' ? 'Yes' : 'No')
+        }, this.$store.state.userInfo.authority)
+        this.tableData = resDataArr
+      } catch (err) {
+        console.error(err)
+        this.tableData = []
+        this.$notify({
+          title: 'Not Found',
+          message: err.message,
+          type: 'warning'
+        })
+      } finally {
+        this.isLoading = false
+      }
+    },
     downloadDemo () {
       var url = 'http://' + this.$store.state.config.baseURL + '/exportdemo'
       var x = document.getElementById('getdemo')
@@ -515,10 +538,6 @@ export default {
 
 .btn-container {
   text-align: right;
-}
-
-#download-demo {
-  margin-top: 15px;
 }
 
 .search-condition-items {

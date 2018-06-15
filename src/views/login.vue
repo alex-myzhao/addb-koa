@@ -78,10 +78,7 @@
         />
       </el-form-item>
     </el-form>
-    <span
-      slot="footer"
-      class="dialog-footer"
-    >
+    <span slot="footer">
       <el-button
         v-for="item in ['Submit', 'Cancel']"
         :key="item"
