@@ -4,7 +4,7 @@ const app = new Koa()
 const json = require('koa-json')
 const logger = require('koa-logger')
 const bodyParser = require('koa-bodyparser')
-const historyApiFallback = require('koa2-history-api-fallback');
+const historyApiFallback = require('koa2-history-api-fallback')
 const serve = require('koa-static')
 
 // Nodejs
@@ -22,12 +22,12 @@ app.use(async (ctx, next) => {
 app.use(bodyParser())
 app.use(json())
 app.use(logger())
-app.use(historyApiFallback())
-
-// static
-app.use(serve(path.resolve('dist')))
 
 app.use(controller())
+
+// static
+app.use(historyApiFallback())
+app.use(serve(path.resolve('dist')))
 
 // time cost
 app.use(async (ctx, next) => {

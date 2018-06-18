@@ -3,16 +3,18 @@ const router = require('koa-router')()
 const path = require('path')
 const fs = require('fs')
 
+const apiConfig = require('./config/api-config')
+
 function addMapping (router, mapping) {
-  for (var url in mapping) {
+  for (let url in mapping) {
     if (url.startsWith('GET ')) {
-      // 如果url类似"GET xxx":
-      let reqPath = url.substring(4)
+      // handle GET requests
+      let reqPath = `/${apiConfig.PREFIX}/${apiConfig.VERSION}/${url.substring(5)}`
       router.get(reqPath, mapping[url])
       console.log(`register URL mapping: GET ${reqPath}`)
     } else if (url.startsWith('POST ')) {
-      // 如果url类似"POST xxx":
-      let reqPath = url.substring(5)
+      // handle POST requests
+      let reqPath = `/${apiConfig.PREFIX}/${apiConfig.VERSION}/${url.substring(6)}`
       router.post(reqPath, mapping[url])
       console.log(`register URL mapping: POST ${reqPath}`)
     } else {
@@ -34,7 +36,7 @@ function addControllers (router, dir) {
 }
 
 module.exports = function (dir) {
-  let controllersDir = dir || 'controllers' // 如果不传参数，扫描目录默认为'controllers'
+  let controllersDir = dir || 'controllers'
   addControllers(router, controllersDir)
   return router.routes()
 }

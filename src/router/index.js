@@ -7,6 +7,7 @@ import Home from '@/views/home'
 import Manage from '@/views/manage'
 import Detail from '@/views/detail'
 import Login from '@/views/login'
+import NotFound from '@/views/not-found'
 
 import BasicSource from '@/components/BasicSource'
 import Survey from '@/components/Survey'
@@ -52,6 +53,9 @@ const routes = [
   }, {
     path: '/login',
     component: Login
+  }, {
+    path: '*',
+    component: NotFound
   }
 ]
 
