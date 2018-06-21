@@ -19,13 +19,14 @@ app.use(async (ctx, next) => {
   await next()
 })
 
+app.use(logger())
 app.use(bodyParser())
 app.use(json())
-app.use(logger())
 
+// handle APIs
 app.use(controller())
 
-// static
+// solve static resources
 app.use(historyApiFallback())
 app.use(serve(path.resolve('dist')))
 
