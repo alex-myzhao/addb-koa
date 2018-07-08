@@ -1,6 +1,6 @@
 {
   "name": "addb-koa",
-  "version": "1.0.0",
+  "version": "1.5.2",
   "description": "Rebuilt ADDB project",
   "author": "Mingyu Zhao",
   "private": true,
@@ -19,6 +19,7 @@
     "koa": "^2.5.1",
     "koa-bodyparser": "^4.2.1",
     "koa-json": "^2.0.2",
+    "koa-jwt": "^3.3.2",
     "koa-logger": "^3.2.0",
     "koa-router": "^7.4.0",
     "koa-static": "^4.0.3",

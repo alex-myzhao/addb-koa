@@ -1,4 +1,6 @@
-# RESTful API Design
+# 0. RESTful API Design
+
+## Design
 
 HTTP Verbs:
 
@@ -19,8 +21,9 @@ Examples:
 - GET /zoos/ID/animals: 列出某个指定动物园的所有动物
 - DELETE /zoos/ID/animals/ID: 删除某个指定动物园的指定动物
 
-## API
+## Contents
 
 Base URL: /api/v2
 
 - [APIs of User Operation]
+- [User](/api-user.html)

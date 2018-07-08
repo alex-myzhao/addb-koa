@@ -1,6 +1,6 @@
-# 1. APIs of User Operation
+# 1. User Operation
 
-## 1.1 Create a new user (Sign Up)
+## 1.1 Create
 
 ```HTTP Request
 POST /user HTTP/1.1
@@ -34,14 +34,14 @@ Content-Type: application/json
 }
 ```
 
-## 1.2 Retrieve the information of a user (Sign In)
+## 1.2 Retrieve
 
 ```HTTP Request
 GET /user/:id HTTP/1.1
 Authorization: [user credentials]
 ```
 
-## 1.3 Update the information of a user
+## 1.3 Update
 
 ```HTTP Request
 PUT /user/:id HTTP/1.1
@@ -54,7 +54,7 @@ Content-Type: application/json
 }
 ```
 
-## 1.4 Delete a user
+## 1.4 Delete
 
 ```HTTP request
 DELETE /user/:id HTTP/1.1
