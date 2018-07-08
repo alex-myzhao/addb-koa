@@ -4,6 +4,7 @@ const app = new Koa()
 const json = require('koa-json')
 const logger = require('koa-logger')
 const bodyParser = require('koa-bodyparser')
+const jwt = require('koa-jwt')
 const historyApiFallback = require('koa2-history-api-fallback')
 const serve = require('koa-static')
 
@@ -12,6 +13,7 @@ const path = require('path')
 
 // DIY middlewares
 const controller = require('./controller')
+const authConfig = require('./config/auth-config')
 
 // log request URL:
 app.use(async (ctx, next) => {
@@ -22,6 +24,22 @@ app.use(async (ctx, next) => {
 app.use(logger())
 app.use(bodyParser())
 app.use(json())
+
+// Custom 401 handling if you don't want to expose koa-jwt errors to users
+app.use(function (ctx, next) {
+  return next().catch((err) => {
+    if (err.status === 401) {
+      ctx.status = 401
+      ctx.body = 'Protected resource, use Authorization header to get access\n'
+    } else {
+      throw err
+    }
+  })
+})
+
+// Middleware below this line is only reached if JWT token is valid
+// unless the URL starts with '/public'
+app.use(jwt({ secret: authConfig.secret }).unless({ path: authConfig.unprotectedPath }))
 
 // handle APIs
 app.use(controller())
